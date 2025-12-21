@@ -13,7 +13,6 @@ const createAdmin = async (payload: any) => {
         password: hashedPass,
         role: UserRole.ADMIN
     }
-    console.log(userData)
     const result = await prisma.$transaction(async (tx) => {
         await tx.user.create({
             data: userData
@@ -25,16 +24,14 @@ const createAdmin = async (payload: any) => {
                 user: true,
             }
         })
-        if (result && result.user) {
-            // @ts-ignore
-            delete result.user.password;
-        }
+
         return adminData
     })
+    if (result && result.user) {
+        (result as any).user.password = undefined;
+    }
     return result
 }
-
-
 
 export const UserService = {
     createAdmin,

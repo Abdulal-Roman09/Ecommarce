@@ -2,7 +2,7 @@ import { UserStatus } from "@prisma/client";
 import config from "../../../config";
 import prisma from "../../../lib/prisma";
 import bcrypt from "bcryptjs";
-import { generateToken, verifyToken } from "../../../lib/generateToken";
+import { generateToken, verifyToken } from "../../../lib/jwtTokenGenerate&Verify";
 import { JwtPayload } from "jsonwebtoken";
 
 const login = async (payload: any) => {
