@@ -11,3 +11,7 @@ export const generateToken = (
         expiresIn
     })
 }
+
+export const verifyToken = (token: string, secret: Secret) => {
+    return jwt.verify(token, secret)
+}

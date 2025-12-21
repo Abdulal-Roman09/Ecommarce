@@ -2,10 +2,11 @@ import { UserStatus } from "@prisma/client";
 import config from "../../../config";
 import prisma from "../../../lib/prisma";
 import bcrypt from "bcryptjs";
-import { generateToken } from "../../../lib/generateToken";
+import { generateToken, verifyToken } from "../../../lib/generateToken";
+import { JwtPayload } from "jsonwebtoken";
 
 const login = async (payload: any) => {
-    
+
     const userData = await prisma.user.findFirstOrThrow({
         where: {
             email: payload.email,
@@ -38,6 +39,35 @@ const login = async (payload: any) => {
     };
 };
 
+const refreshToken = async (token: string) => {
+    let decodedData
+    try {
+        decodedData = verifyToken(token, config.refresh_token.secret) as JwtPayload
+    } catch (err) {
+        throw new Error("You are not authorized!");
+    }
+    const userData = await prisma.user.findUniqueOrThrow({
+        where: {
+            email: decodedData?.email,
+            status: UserStatus.ACTIVE
+        }
+    });
+    const accessToken = generateToken(
+        {
+            email: userData.email,
+            role: userData.role
+        },
+        config.access_token.secret,
+        config.access_token.expiresIn
+    );
+
+    return {
+        accessToken,
+        needPasswordChange: userData.isPasswordChagne
+    }
+}
+
 export const AuthService = {
-    login
+    login,
+    refreshToken
 };

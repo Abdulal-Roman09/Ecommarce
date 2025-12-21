@@ -10,7 +10,6 @@ const login = catchAsync(async (req: Request, res: Response) => {
     const result = await AuthService.login(req.body)
     const { refreshToken } = result;
 
-    // set token in the cookie in the cookies
     res.cookie("refreshToken", refreshToken, {
         secure: config.env === 'production',
         httpOnly: true,
@@ -28,7 +27,20 @@ const login = catchAsync(async (req: Request, res: Response) => {
     });
 })
 
+const refreshToken = catchAsync(async (req: Request, res: Response) => {
+    const { refreshToken } = req.cookies
+    const result = await AuthService.refreshToken(refreshToken)
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "access Token is get successfully!",
+        data: result
+    });
+})
+
 
 export const AuthController = {
-    login
+    login,
+    refreshToken
 };
