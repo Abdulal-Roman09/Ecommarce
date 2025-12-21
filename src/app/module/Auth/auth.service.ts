@@ -13,13 +13,10 @@ const login = async (payload: any) => {
             status: UserStatus.ACTIVE
         }
     });
-
     const isCorrectPassword = await bcrypt.compare(payload.password, userData.password);
-
     if (!isCorrectPassword) {
         throw new Error("Password is not correct!");
     }
-
     const accessToken = generateToken(
         { email: userData.email, role: userData.role },
         config.access_token.secret as string,
