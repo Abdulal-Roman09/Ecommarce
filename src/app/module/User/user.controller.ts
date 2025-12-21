@@ -2,38 +2,29 @@ import { Request, Response } from "express";
 import httpStatus from "http-status";
 import { UserService } from "./user.services";
 import sendResponse from "../../../utils/sendResponse";
+import catchAsync from "../../../utils/catchAsync";
 
-const createUser = async (req: Request, res: Response) => {
+const createUser = catchAsync(async (req: Request, res: Response) => {
 
-    try {
-        const result = await UserService.createUser(req.body)
+    const result = await UserService.createUser(req.body)
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "user is created",
+        data: result
+    });
+})
 
-        sendResponse(res, {
-            statusCode: httpStatus.OK,
-            success: true,
-            message: "user is created",
-            data: result
-        });
-    } catch (error) {
-        res.status(500).json({ message: 'Error creating user' });
-    }
-};
+const getAllUser = catchAsync(async (req: Request, res: Response) => {
 
-const getAllUser = async (req: Request, res: Response) => {
-
-    try {
-        const result = await UserService.getAllUser(req.body)
-
-        sendResponse(res, {
-            statusCode: httpStatus.OK,
-            success: true,
-            message: "user is created",
-            data: result
-        });
-    } catch (error) {
-        res.status(500).json({ message: 'Error creating user' });
-    }
-};
+    const result = await UserService.getAllUser(req.body)
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "user is fatchd succseefully",
+        data: result
+    });
+})
 
 export const UserController = {
     createUser,
