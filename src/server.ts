@@ -1,14 +1,13 @@
 import dotenv from 'dotenv';
 import app from './app';
+import config from './config';
 
 dotenv.config();
 
-const port = process.env.PORT || 5000;
-
 async function main() {
     try {
-        app.listen(port, () => {
-            console.log(` 🌿 Server is running on ---> http://localhost:${port}`);
+        app.listen(config.port, () => {
+            console.log(` 🌿 Server is running on ---> http://localhost:${config.port}`);
         });
     } catch (err) {
         console.error("❌ Server failed to start:", err);
