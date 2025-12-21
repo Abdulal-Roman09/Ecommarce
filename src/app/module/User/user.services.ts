@@ -1,22 +1,41 @@
+
+import { UserRole } from "@prisma/client"
+import config from "../../../config"
 import prisma from "../../../lib/prisma"
+import bcrypt from "bcryptjs"
+import { $ZodCheckLengthEquals } from "zod/v4/core"
 
-const createUser = async (user: any) => {
-    const result = await prisma.user.create({
-        data: user
-    })
-    return result
-}
+const createAdmin = async (payload: any) => {
 
-const getAllUser = async (user: any) => {
-    const result = await prisma.user.findMany({
-        where: {
-            email: user.email
+    const hashedPass = await bcrypt.hash(payload.password, config.solt_round)
+    const userData = {
+        email: payload.admin.email,
+        password: hashedPass,
+        role: UserRole.ADMIN
+    }
+    console.log(userData)
+    const result = await prisma.$transaction(async (tx) => {
+        await tx.user.create({
+            data: userData
+        })
+
+        const adminData = await tx.admin.create({
+            data: payload.admin,
+            include: {
+                user: true,
+            }
+        })
+        if (result && result.user) {
+            // @ts-ignore
+            delete result.user.password;
         }
+        return adminData
     })
     return result
 }
+
+
 
 export const UserService = {
-    createUser,
-    getAllUser
+    createAdmin,
 }
