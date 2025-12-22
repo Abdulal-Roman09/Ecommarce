@@ -27,5 +27,10 @@ route.post(
     AuthController.forgetPassword
 )
 
+route.post(
+    "/reset-password",
+    AuthController.resetPassword
+)
+
 
 export const AuthRoutes = route

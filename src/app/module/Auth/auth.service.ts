@@ -123,10 +123,12 @@ const forgetPassword = async (payload: { email: string }) => {
     )
     const resetPasswordLink = config.baseUrl + `?userId=${userData.id}&token=${resetToken}`
 
+    console.log(resetPasswordLink)
+
     const templatePath = path.join(__dirname, '../../../lib/html/resetPasswordLink.html');
 
     const htmlBuffer = fs.readFileSync(templatePath);
-    
+
     let html = htmlBuffer.toString('utf8');
     // Remove BOM if present
     if (htmlBuffer[0] === 0xEF && htmlBuffer[1] === 0xBB && htmlBuffer[2] === 0xBF) {
@@ -137,9 +139,36 @@ const forgetPassword = async (payload: { email: string }) => {
     await emailSender(userData.email, html, "🌿 EcoMart");
 }
 
+const resetPassword = async (token: string, payload: any) => {
+
+    const userData = await prisma.user.findUniqueOrThrow({
+        where: {
+            id: payload.id,
+            status: UserStatus.ACTIVE
+        }
+    })
+    const isValidToken = verifyToken(token, config.reset_token.secret)
+
+    if (!isValidToken) {
+        throw new AppError(httpStatus.FORBIDDEN, "firbidden")
+    }
+    const hasedNewPassword = await bcrypt.hash(payload.password, config.solt_round)
+    await prisma.user.update({
+        where: {
+            id: payload.id
+        },
+        data: {
+            password: hasedNewPassword
+        }
+    })
+    return {
+        message: "password is reset successfully"
+    }
+}
 export const AuthService = {
     login,
     refreshToken,
     changePassword,
-    forgetPassword
+    forgetPassword,
+    resetPassword
 };
