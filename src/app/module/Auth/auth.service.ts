@@ -8,6 +8,9 @@ import AppError from "../../errors/appError";
 import httpStatus from 'http-status'
 import { IAuthLogin, IAuthUser } from "../../interface/auth";
 import { IChangePassword, ILoginResponse } from "./auth.interfact";
+import path from "path";
+import fs from 'fs'
+import emailSender from "../../../lib/emailSender";
 
 const login = async (payload: IAuthLogin): Promise<ILoginResponse> => {
 
@@ -112,15 +115,26 @@ const forgetPassword = async (payload: { email: string }) => {
     })
     const resetToken = generateToken(
         {
-            eamil: userData.email,
+            email: userData.email,
             role: userData.role
         },
         config.reset_token.secret,
         config.reset_token.expiresIn
     )
     const resetPasswordLink = config.baseUrl + `?userId=${userData.id}&token=${resetToken}`
-    console.log(resetPasswordLink)
 
+    const templatePath = path.join(__dirname, '../../../lib/html/resetPasswordLink.html');
+
+    const htmlBuffer = fs.readFileSync(templatePath);
+    
+    let html = htmlBuffer.toString('utf8');
+    // Remove BOM if present
+    if (htmlBuffer[0] === 0xEF && htmlBuffer[1] === 0xBB && htmlBuffer[2] === 0xBF) {
+        html = html.slice(1);
+    }
+    html = html.replace(/{{resetLink}}/g, resetPasswordLink);
+
+    await emailSender(userData.email, html, "🌿 EcoMart");
 }
 
 export const AuthService = {
