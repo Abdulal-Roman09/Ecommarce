@@ -1,11 +1,10 @@
-
-import { UserRole } from "@prisma/client"
+import { Admin, UserRole } from "@prisma/client"
 import config from "../../../config"
 import prisma from "../../../lib/prisma"
 import bcrypt from "bcryptjs"
-import { $ZodCheckLengthEquals } from "zod/v4/core"
+import { IAdminCreatePayload } from "./user.interfact"
 
-const createAdmin = async (payload: any) => {
+const createAdmin = async (payload: IAdminCreatePayload): Promise<Admin | null> => {
 
     const hashedPass = await bcrypt.hash(payload.password, config.solt_round)
     const userData = {
@@ -27,9 +26,11 @@ const createAdmin = async (payload: any) => {
 
         return adminData
     })
+
     if (result && result.user) {
         (result as any).user.password = undefined;
     }
+
     return result
 }
 

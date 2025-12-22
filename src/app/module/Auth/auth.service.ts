@@ -6,29 +6,34 @@ import { generateToken, verifyToken } from "../../../lib/jwtTokenGenerate&Verify
 import { JwtPayload } from "jsonwebtoken";
 import AppError from "../../errors/appError";
 import httpStatus from 'http-status'
+import { IAuthLogin } from "../../interface/auth";
+import { ILoginResponse } from "./auth.interfact";
 
-const login = async (payload: any) => {
+const login = async (payload: IAuthLogin): Promise<ILoginResponse | null> => {
 
     const userData = await prisma.user.findFirstOrThrow({
         where: {
-            email: payload.email,
+            email: payload?.email,
             status: UserStatus.ACTIVE
         }
     });
-    const isCorrectPassword = await bcrypt.compare(payload.password, userData.password);
+
+    const isCorrectPassword = await bcrypt.compare(payload?.password as string, userData.password);
+
     if (!isCorrectPassword) {
-        throw new AppError(httpStatus.UNAUTHORIZED, "Password is not correct!");
+        throw new AppError(httpStatus.BAD_REQUEST, "Password is not correct!");
     }
+
     const accessToken = generateToken(
         { email: userData.email, role: userData.role },
-        config.access_token.secret as string,
-        config.access_token.expiresIn as string
+        config.access_token.secret,
+        config.access_token.expiresIn
     );
 
     const refreshToken = generateToken(
         { email: userData.email, role: userData.role },
-        config.refresh_token.secret as string,
-        config.refresh_token.expiresIn as string
+        config.refresh_token.secret,
+        config.refresh_token.expiresIn
     );
 
     return {
@@ -38,7 +43,7 @@ const login = async (payload: any) => {
     };
 };
 
-const refreshToken = async (token: string) => {
+const refreshToken = async (token: string): Promise<Partial<ILoginResponse>> => {
     let decodedData
     try {
         decodedData = verifyToken(token, config.refresh_token.secret) as JwtPayload
