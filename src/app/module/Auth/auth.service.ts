@@ -6,10 +6,10 @@ import { generateToken, verifyToken } from "../../../lib/jwtTokenGenerate&Verify
 import { JwtPayload } from "jsonwebtoken";
 import AppError from "../../errors/appError";
 import httpStatus from 'http-status'
-import { IAuthLogin } from "../../interface/auth";
-import { ILoginResponse } from "./auth.interfact";
+import { IAuthLogin, IAuthUser } from "../../interface/auth";
+import { IChangePassword, ILoginResponse } from "./auth.interfact";
 
-const login = async (payload: IAuthLogin): Promise<ILoginResponse | null> => {
+const login = async (payload: IAuthLogin): Promise<ILoginResponse> => {
 
     const userData = await prisma.user.findFirstOrThrow({
         where: {
@@ -71,7 +71,40 @@ const refreshToken = async (token: string): Promise<Partial<ILoginResponse>> => 
     }
 }
 
+const changePassword = async (user: IAuthUser, payload: IChangePassword) => {
+    const { newPassword, oldPassword } = payload
+
+    const userData = await prisma.user.findUnique({
+        where: {
+            email: user?.email,
+            status: UserStatus.ACTIVE
+        }
+    })
+
+    const isCorrectPassword = await bcrypt.compare(oldPassword, userData?.password as string)
+
+    if (!isCorrectPassword) {
+        throw new AppError(httpStatus.UNAUTHORIZED, "you are unAuthrized")
+    }
+
+    const hasedNewPassword = await bcrypt.hash(newPassword, config.solt_round)
+
+    await prisma.user.update({
+        where: {
+            id: userData?.id
+        },
+        data: {
+            password: hasedNewPassword
+        }
+    })
+
+    return {
+        message: "password change successfully"
+    }
+}
+
 export const AuthService = {
     login,
-    refreshToken
+    refreshToken,
+    changePassword
 };

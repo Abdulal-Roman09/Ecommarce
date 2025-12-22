@@ -4,10 +4,17 @@ import sendResponse from "../../../utils/sendResponse";
 import catchAsync from "../../../utils/catchAsync";
 import { AuthService } from "./auth.service";
 import config from "../../../config";
+import AppError from "../../errors/appError";
+import { IAuthUser } from "../../interface/auth";
 
 const login = catchAsync(async (req: Request, res: Response) => {
 
     const result = await AuthService.login(req.body)
+
+    if (!result) {
+        throw new AppError(httpStatus.NOT_FOUND, "Login failed!");
+    }
+
     const { refreshToken } = result;
 
     res.cookie("refreshToken", refreshToken, {
@@ -39,8 +46,21 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
     });
 })
 
+const changePassword = catchAsync(async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const user = req.user
+    const result = await AuthService.changePassword(user as IAuthUser, req.body)
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "password chagned successfully!",
+        data: result
+    });
+})
+
 
 export const AuthController = {
     login,
-    refreshToken
+    refreshToken,
+    changePassword
 };
