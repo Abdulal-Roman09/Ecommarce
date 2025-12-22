@@ -103,8 +103,29 @@ const changePassword = async (user: IAuthUser, payload: IChangePassword) => {
     }
 }
 
+const forgetPassword = async (payload: { email: string }) => {
+    const userData = await prisma.user.findUniqueOrThrow({
+        where: {
+            email: payload.email,
+            status: UserStatus.ACTIVE
+        }
+    })
+    const resetToken = generateToken(
+        {
+            eamil: userData.email,
+            role: userData.role
+        },
+        config.reset_token.secret,
+        config.reset_token.expiresIn
+    )
+    const resetPasswordLink = config.baseUrl + `?userId=${userData.id}&token=${resetToken}`
+    console.log(resetPasswordLink)
+
+}
+
 export const AuthService = {
     login,
     refreshToken,
-    changePassword
+    changePassword,
+    forgetPassword
 };
