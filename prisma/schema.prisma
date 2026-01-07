@@ -17,8 +17,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  admin  Admin?
-  vendor Vendor?
+  admin    Admin?
+  vendor   Vendor?
+  customer Customer?
 
   @@map("users")
 }
@@ -50,7 +51,7 @@ model Vendor {
   profilePhoto  String?
   contactNumber String
   gender        Gender
-  address String
+  address       String
 
   rating Float @default(0)
 
@@ -60,6 +61,24 @@ model Vendor {
   updatedAt  DateTime @updatedAt
 
   @@map("vendors")
+}
+
+model Customer {
+  id String @id @default(uuid())
+
+  email String @unique
+  user  User   @relation(fields: [email], references: [email])
+
+  name           String
+  contactNumber  String
+  profilePhoto   String?
+  presentAddress String
+
+  isDelete  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("customers")
 }
 
 enum UserRole {
@@ -77,15 +96,4 @@ enum UserStatus {
 enum Gender {
   MALE
   FEMALE
-}
-
-enum BusinessType {
-  INDIVIDUAL
-  COMPANY
-}
-
-enum PayoutMethod {
-  BANK
-  MOBILE_BANK
-  STRIPE
 }
