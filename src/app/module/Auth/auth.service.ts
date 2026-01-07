@@ -123,8 +123,6 @@ const forgetPassword = async (payload: { email: string }) => {
     )
     const resetPasswordLink = config.baseUrl + `?userId=${userData.id}&token=${resetToken}`
 
-    console.log(resetPasswordLink)
-
     const templatePath = path.join(__dirname, '../../../lib/html/resetPasswordLink.html');
 
     const htmlBuffer = fs.readFileSync(templatePath);
@@ -155,7 +153,7 @@ const resetPassword = async (token: string, payload: any) => {
     const hasedNewPassword = await bcrypt.hash(payload.password, config.solt_round)
     await prisma.user.update({
         where: {
-            id: payload.id
+            id: userData.id
         },
         data: {
             password: hasedNewPassword

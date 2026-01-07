@@ -15,8 +15,19 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
     });
 })
 
+const createVendor = catchAsync(async (req: Request, res: Response) => {
+
+    const result = await UserService.createVendor(req.body)
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Vendor is created",
+        data: result
+    });
+})
 
 
 export const UserController = {
     createAdmin,
-};
+    createVendor
+}

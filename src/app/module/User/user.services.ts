@@ -34,6 +34,11 @@ const createAdmin = async (payload: IAdminCreatePayload): Promise<Admin | null> 
     return result
 }
 
+const createVendor = async (payload: IAdminCreatePayload) => {
+    console.log(payload)
+}
+
 export const UserService = {
     createAdmin,
+    createVendor
 }
