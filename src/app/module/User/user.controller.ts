@@ -6,7 +6,7 @@ import catchAsync from "../../../utils/catchAsync";
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
 
-    const result = await UserService.createAdmin(req.body)
+    const result = await UserService.createAdmin(req)
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,

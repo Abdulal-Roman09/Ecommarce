@@ -42,7 +42,7 @@ const login = async (payload: IAuthLogin): Promise<ILoginResponse> => {
     return {
         accessToken,
         refreshToken,
-        needPasswordChange: userData.isPasswordChagne
+        needPasswordChange: userData
     };
 };
 

@@ -1,10 +1,12 @@
-import cloudinary from "./cloudinary"
 import fs from 'fs'
+import cloudinary from "./cloudinary"
+import { ICloudinaryResponse, IUploadedFile } from '../app/interface/file'
 
-const sendToCloudinary = async (file: any) => {
+const sendToCloudinary = async (file: IUploadedFile): Promise<ICloudinaryResponse |
+    undefined> => {
     return new Promise((resolve, reject) => {
         cloudinary.uploader.upload(file.path,
-            (error: Error, result: any) => {
+            (error: Error, result: ICloudinaryResponse) => {
                 fs.unlinkSync(file.path)
                 if (error) {
                     reject(error)

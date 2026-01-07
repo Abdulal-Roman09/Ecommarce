@@ -3,12 +3,21 @@ import config from "../../../config"
 import prisma from "../../../lib/prisma"
 import bcrypt from "bcryptjs"
 import { IAdminCreatePayload, ICustomerCreatePayload } from "./user.interfact"
+import sendToCloudinary from "../../../lib/sendToCloudinary"
+import { IUploadedFile } from "../../interface/file"
+import { Request } from "express"
 
-const createAdmin = async (payload: IAdminCreatePayload): Promise<Admin | null> => {
+const createAdmin = async (req: Request): Promise<Admin> => {
+    const file: IUploadedFile = req.file
+    console.log(file, "file")
+    if (file) {
+        const uploadToCloudinary = await sendToCloudinary(file)
+        req.body.admin.profilePhoto = uploadToCloudinary?.secure_url
+    }
 
-    const hashedPass = await bcrypt.hash(payload.password, config.solt_round)
+    const hashedPass = await bcrypt.hash(req.body.password, config.solt_round)
     const userData = {
-        email: payload.admin.email,
+        email: req.body.admin.email,
         password: hashedPass,
         role: UserRole.ADMIN
     }
@@ -18,7 +27,7 @@ const createAdmin = async (payload: IAdminCreatePayload): Promise<Admin | null> 
         })
 
         const adminData = await tx.admin.create({
-            data: payload.admin,
+            data: req.body.admin,
             include: {
                 user: true,
             }
