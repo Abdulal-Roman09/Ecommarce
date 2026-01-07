@@ -7,3 +7,13 @@ export type IAdminCreatePayload = {
         profilePhoto?: string;
     }
 }
+export type ICustomerCreatePayload = {
+    password: string;
+    customer: {
+        name: string;
+        email: string;
+        contactNumber: string;
+        profilePhoto?: string;
+        presentAddress: string,
+    }
+}

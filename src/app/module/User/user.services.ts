@@ -1,8 +1,8 @@
-import { Admin, UserRole } from "@prisma/client"
+import { Admin, Customer, UserRole } from "@prisma/client"
 import config from "../../../config"
 import prisma from "../../../lib/prisma"
 import bcrypt from "bcryptjs"
-import { IAdminCreatePayload } from "./user.interfact"
+import { IAdminCreatePayload, ICustomerCreatePayload } from "./user.interfact"
 
 const createAdmin = async (payload: IAdminCreatePayload): Promise<Admin | null> => {
 
@@ -35,10 +35,33 @@ const createAdmin = async (payload: IAdminCreatePayload): Promise<Admin | null> 
 }
 
 const createVendor = async (payload: IAdminCreatePayload) => {
-    console.log(payload)
+
+}
+
+const createCustomer = async (payload: ICustomerCreatePayload): Promise<Customer | any> => {
+    const hashedPass = await bcrypt.hash(payload.password, config.solt_round)
+    const userData = {
+        password: hashedPass,
+        email: payload.customer.email,
+        role: UserRole.CUSTOMER
+    }
+    const result = await prisma.$transaction(async (tx) => {
+        await tx.user.create({
+            data: userData
+        })
+        const customerData = await tx.customer.create({
+            data: payload.customer,
+            include: {
+                user: true
+            }
+        })
+        return customerData
+    })
+    return result
 }
 
 export const UserService = {
     createAdmin,
-    createVendor
+    createVendor,
+    createCustomer
 }

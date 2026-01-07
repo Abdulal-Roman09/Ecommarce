@@ -3,18 +3,24 @@ import { UserController } from "./user.controller";
 import auth from "../../middleware/auth";
 import { UserRole } from "@prisma/client";
 
-const route = express.Router()
+const router = express.Router()
 
-route.post(
+router.post(
     "/create-admin",
     auth(UserRole.ADMIN),
     UserController.createAdmin
 )
 
-route.post(
+router.post(
     "/create-vendor",
+    auth(UserRole.ADMIN),
     UserController.createVendor
 )
 
+router.post(
+    "/create-customer",
+    UserController.createCustomer
+)
 
-export const UserRoutes = route
+
+export const UserRoutes = router

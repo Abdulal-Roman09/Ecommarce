@@ -26,8 +26,20 @@ const createVendor = catchAsync(async (req: Request, res: Response) => {
     });
 })
 
+const createCustomer = catchAsync(async (req: Request, res: Response) => {
+
+    const result = await UserService.createCustomer(req.body)
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Customer is created",
+        data: result
+    });
+})
+
 
 export const UserController = {
     createAdmin,
-    createVendor
+    createVendor,
+    createCustomer
 }
