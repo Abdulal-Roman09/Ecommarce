@@ -33,4 +33,4 @@ export interface IUploadedFile {
   filename: string;
   path: string;
   size: number;
-}
+} 

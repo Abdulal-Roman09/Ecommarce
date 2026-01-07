@@ -25,7 +25,11 @@ router.post(
 
 router.post(
     "/create-customer",
-    UserController.createCustomer
+    fileUploader.upload.single('file'),
+    (req: Request, res: Response, next: NextFunction) => {
+        req.body = UserValidationSchema.createCustomer.parse(JSON.parse(req.body.data))
+        return UserController.createCustomer(req, res, next)
+    }
 )
 
 

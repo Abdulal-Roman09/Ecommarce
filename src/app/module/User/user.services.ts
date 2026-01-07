@@ -2,14 +2,13 @@ import { Admin, Customer, UserRole } from "@prisma/client"
 import config from "../../../config"
 import prisma from "../../../lib/prisma"
 import bcrypt from "bcryptjs"
-import { IAdminCreatePayload, ICustomerCreatePayload } from "./user.interfact"
+import { IAdminCreatePayload, } from "./user.interfact"
 import sendToCloudinary from "../../../lib/sendToCloudinary"
 import { IUploadedFile } from "../../interface/file"
 import { Request } from "express"
 
 const createAdmin = async (req: Request): Promise<Admin> => {
-    const file: IUploadedFile = req.file
-    console.log(file, "file")
+    const file: IUploadedFile = req.file as IUploadedFile
     if (file) {
         const uploadToCloudinary = await sendToCloudinary(file)
         req.body.admin.profilePhoto = uploadToCloudinary?.secure_url
@@ -47,11 +46,19 @@ const createVendor = async (payload: IAdminCreatePayload) => {
 
 }
 
-const createCustomer = async (payload: ICustomerCreatePayload): Promise<Customer | any> => {
-    const hashedPass = await bcrypt.hash(payload.password, config.solt_round)
+const createCustomer = async (req: Request): Promise<Customer> => {
+    const file: IUploadedFile = req.file as IUploadedFile
+
+    if (file) {
+        const uploadToCloudinary = await sendToCloudinary(file)
+        req.body.customer.profilePhoto = uploadToCloudinary?.secure_url
+    }
+
+    const hashedPass = await bcrypt.hash(req.body.password, config.solt_round)
+    
     const userData = {
         password: hashedPass,
-        email: payload.customer.email,
+        email: req.body.customer.email,
         role: UserRole.CUSTOMER
     }
     const result = await prisma.$transaction(async (tx) => {
@@ -59,7 +66,7 @@ const createCustomer = async (payload: ICustomerCreatePayload): Promise<Customer
             data: userData
         })
         const customerData = await tx.customer.create({
-            data: payload.customer,
+            data: req.body.customer,
             include: {
                 user: true
             }

@@ -28,7 +28,7 @@ const createVendor = catchAsync(async (req: Request, res: Response) => {
 
 const createCustomer = catchAsync(async (req: Request, res: Response) => {
 
-    const result = await UserService.createCustomer(req.body)
+    const result = await UserService.createCustomer(req)
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
