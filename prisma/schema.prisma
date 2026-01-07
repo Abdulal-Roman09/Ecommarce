@@ -8,37 +8,58 @@ datasource db {
 }
 
 model User {
-  id               String     @id @default(uuid())
-  email            String     @unique
-  password         String
-  role             UserRole   @default(CUSTOMER)
-  status           UserStatus @default(ACTIVE)
-  isPasswordChagne Boolean    @default(true)
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-  admin            Admin?
+  id       String     @id @default(uuid())
+  email    String     @unique
+  password String
+  role     UserRole   @default(CUSTOMER)
+  status   UserStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  admin  Admin?
+  vendor Vendor?
 
   @@map("users")
 }
 
 model Admin {
-  id    String @id @default(uuid())
-  name  String
+  id String @id @default(uuid())
+
   email String @unique
   user  User   @relation(fields: [email], references: [email])
 
+  name          String
   profilePhoto  String?
   contactNumber String
-  isDelete      Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+
+  isDelete  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("admins")
 }
 
-enum UserStatus {
-  ACTIVE
-  BLOCKED
+model Vendor {
+  id String @id @default(uuid())
+
+  email String @unique
+  user  User   @relation(fields: [email], references: [email])
+
+  name          String
+  profilePhoto  String?
+  contactNumber String
+  gender        Gender
+  address String
+
+  rating Float @default(0)
+
+  isVerified Boolean  @default(false)
+  isDelete   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("vendors")
 }
 
 enum UserRole {
@@ -46,4 +67,25 @@ enum UserRole {
   ADMIN
   VENDOR
   CUSTOMER
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum BusinessType {
+  INDIVIDUAL
+  COMPANY
+}
+
+enum PayoutMethod {
+  BANK
+  MOBILE_BANK
+  STRIPE
 }
