@@ -19,11 +19,11 @@ router.post(
 
 router.post(
     "/create-vendor",
-    auth(UserRole.ADMIN),
+    // auth(UserRole.ADMIN),
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
-        req.body = UserValidationSchema.createCustomer.parse(JSON.parse(req.body.data))
-        return UserController.createCustomer(req, res, next)
+        req.body = UserValidationSchema.createVendor.parse(JSON.parse(req.body.data))
+        return UserController.createVendor(req, res, next)
     }
 )
 
@@ -31,8 +31,8 @@ router.post(
     "/create-customer",
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
-        req.body = UserValidationSchema.createVendor.parse(JSON.parse(req.body.data))
-        return UserController.createVendor(req, res, next)
+        req.body = UserValidationSchema.createCustomer.parse(JSON.parse(req.body.data))
+        return UserController.createCustomer(req, res, next)
     }
 )
 

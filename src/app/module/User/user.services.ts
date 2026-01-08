@@ -7,19 +7,23 @@ import sendToCloudinary from "../../../lib/sendToCloudinary"
 import { Admin, Customer, UserRole, Vendor } from "@prisma/client"
 
 const createAdmin = async (req: Request): Promise<Admin> => {
+
     const file: IUploadedFile = req.file as IUploadedFile
+
     if (file) {
         const uploadToCloudinary = await sendToCloudinary(file)
         req.body.admin.profilePhoto = uploadToCloudinary?.secure_url
     }
 
     const hashedPass = await bcrypt.hash(req.body.password, config.solt_round)
+
     const userData = {
         email: req.body.admin.email,
         password: hashedPass,
         role: UserRole.ADMIN
     }
     const result = await prisma.$transaction(async (tx) => {
+
         await tx.user.create({
             data: userData
         })
@@ -30,13 +34,13 @@ const createAdmin = async (req: Request): Promise<Admin> => {
                 user: true,
             }
         })
+        const { password, ...userWithoutPassword } = adminData.user;
 
-        return adminData
+        return {
+            ...adminData,
+            user: userWithoutPassword
+        };
     })
-
-    if (result && result.user) {
-        (result as any).user.password = undefined;
-    }
 
     return result
 }
@@ -47,7 +51,7 @@ const createVendor = async (req: Request): Promise<Vendor> => {
 
     if (file) {
         const uploadToCloudinary = await sendToCloudinary(file)
-        req.body.customer.profilePhoto = uploadToCloudinary?.secure_url
+        req.body.vendor.profilePhoto = uploadToCloudinary?.secure_url
     }
 
     const hashedPass = await bcrypt.hash(req.body.password, config.solt_round)
@@ -59,6 +63,7 @@ const createVendor = async (req: Request): Promise<Vendor> => {
     }
 
     const result = await prisma.$transaction(async (tx) => {
+
         await tx.user.create({
             data: userData
         })
@@ -69,7 +74,11 @@ const createVendor = async (req: Request): Promise<Vendor> => {
                 user: true
             }
         })
-        return vendorData
+        const { password, ...userWithoutPassword } = vendorData.user;
+        return {
+            ...vendorData,
+            user: userWithoutPassword
+        };
     })
 
     return result
@@ -91,6 +100,7 @@ const createCustomer = async (req: Request): Promise<Customer> => {
         role: UserRole.CUSTOMER
     }
     const result = await prisma.$transaction(async (tx) => {
+
         await tx.user.create({
             data: userData
         })
@@ -101,8 +111,12 @@ const createCustomer = async (req: Request): Promise<Customer> => {
                 user: true
             }
         })
+        const { password, ...userWithoutPassword } = customerData.user;
+        return {
+            ...customerData,
+            user: userWithoutPassword
+        };
         return customerData
-
     })
 
     return result
