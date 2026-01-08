@@ -1,11 +1,10 @@
-import { Admin, Customer, UserRole } from "@prisma/client"
+import bcrypt from "bcryptjs"
+import { Request } from "express"
 import config from "../../../config"
 import prisma from "../../../lib/prisma"
-import bcrypt from "bcryptjs"
-import { IAdminCreatePayload, } from "./user.interfact"
-import sendToCloudinary from "../../../lib/sendToCloudinary"
 import { IUploadedFile } from "../../interface/file"
-import { Request } from "express"
+import sendToCloudinary from "../../../lib/sendToCloudinary"
+import { Admin, Customer, UserRole, Vendor } from "@prisma/client"
 
 const createAdmin = async (req: Request): Promise<Admin> => {
     const file: IUploadedFile = req.file as IUploadedFile
@@ -42,8 +41,38 @@ const createAdmin = async (req: Request): Promise<Admin> => {
     return result
 }
 
-const createVendor = async (payload: IAdminCreatePayload) => {
+const createVendor = async (req: Request): Promise<Vendor> => {
 
+    const file: IUploadedFile = req.file as IUploadedFile
+
+    if (file) {
+        const uploadToCloudinary = await sendToCloudinary(file)
+        req.body.customer.profilePhoto = uploadToCloudinary?.secure_url
+    }
+
+    const hashedPass = await bcrypt.hash(req.body.password, config.solt_round)
+
+    const userData = {
+        password: hashedPass,
+        email: req.body.vendor.email,
+        role: UserRole.VENDOR
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+        await tx.user.create({
+            data: userData
+        })
+
+        const vendorData = await tx.vendor.create({
+            data: req.body.vendor,
+            include: {
+                user: true
+            }
+        })
+        return vendorData
+    })
+
+    return result
 }
 
 const createCustomer = async (req: Request): Promise<Customer> => {
@@ -55,7 +84,7 @@ const createCustomer = async (req: Request): Promise<Customer> => {
     }
 
     const hashedPass = await bcrypt.hash(req.body.password, config.solt_round)
-    
+
     const userData = {
         password: hashedPass,
         email: req.body.customer.email,
@@ -65,6 +94,7 @@ const createCustomer = async (req: Request): Promise<Customer> => {
         await tx.user.create({
             data: userData
         })
+
         const customerData = await tx.customer.create({
             data: req.body.customer,
             include: {
@@ -72,7 +102,9 @@ const createCustomer = async (req: Request): Promise<Customer> => {
             }
         })
         return customerData
+
     })
+
     return result
 }
 

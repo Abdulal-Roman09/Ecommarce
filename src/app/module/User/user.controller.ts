@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
 import httpStatus from "http-status";
+import { Request, Response } from "express";
 import { UserService } from "./user.services";
-import sendResponse from "../../../utils/sendResponse";
 import catchAsync from "../../../utils/catchAsync";
+import sendResponse from "../../../utils/sendResponse";
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
 
@@ -17,7 +17,7 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
 
 const createVendor = catchAsync(async (req: Request, res: Response) => {
 
-    const result = await UserService.createVendor(req.body)
+    const result = await UserService.createVendor(req)
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,

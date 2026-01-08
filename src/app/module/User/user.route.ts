@@ -1,9 +1,9 @@
-import express, { NextFunction, Request, Response } from "express";
-import { UserController } from "./user.controller";
 import auth from "../../middleware/auth";
 import { UserRole } from "@prisma/client";
 import { fileUploader } from "../../../lib/multer";
+import { UserController } from "./user.controller";
 import { UserValidationSchema } from "./user.validation";
+import express, { NextFunction, Request, Response } from "express";
 
 const router = express.Router()
 
@@ -20,15 +20,19 @@ router.post(
 router.post(
     "/create-vendor",
     auth(UserRole.ADMIN),
-    UserController.createVendor
+    fileUploader.upload.single('file'),
+    (req: Request, res: Response, next: NextFunction) => {
+        req.body = UserValidationSchema.createCustomer.parse(JSON.parse(req.body.data))
+        return UserController.createCustomer(req, res, next)
+    }
 )
 
 router.post(
     "/create-customer",
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
-        req.body = UserValidationSchema.createCustomer.parse(JSON.parse(req.body.data))
-        return UserController.createCustomer(req, res, next)
+        req.body = UserValidationSchema.createVendor.parse(JSON.parse(req.body.data))
+        return UserController.createVendor(req, res, next)
     }
 )
 

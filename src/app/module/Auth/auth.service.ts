@@ -1,16 +1,16 @@
-import { UserStatus } from "@prisma/client";
+import fs from 'fs'
+import path from "path";
+import bcrypt from "bcryptjs";
+import httpStatus from 'http-status'
 import config from "../../../config";
 import prisma from "../../../lib/prisma";
-import bcrypt from "bcryptjs";
-import { generateToken, verifyToken } from "../../../lib/jwtTokenGenerate&Verify";
 import { JwtPayload } from "jsonwebtoken";
+import { UserStatus } from "@prisma/client";
 import AppError from "../../errors/appError";
-import httpStatus from 'http-status'
+import emailSender from "../../../lib/emailSender";
 import { IAuthLogin, IAuthUser } from "../../interface/auth";
 import { IChangePassword, ILoginResponse } from "./auth.interfact";
-import path from "path";
-import fs from 'fs'
-import emailSender from "../../../lib/emailSender";
+import { generateToken, verifyToken } from "../../../lib/jwtTokenGenerate&Verify";
 
 const login = async (payload: IAuthLogin): Promise<ILoginResponse> => {
 
@@ -28,13 +28,21 @@ const login = async (payload: IAuthLogin): Promise<ILoginResponse> => {
     }
 
     const accessToken = generateToken(
-        { email: userData.email, role: userData.role },
+        {
+            email: userData.email,
+            role: userData.role,
+            id: userData.id
+        },
         config.access_token.secret,
         config.access_token.expiresIn
     );
 
     const refreshToken = generateToken(
-        { email: userData.email, role: userData.role },
+        {
+            email: userData.email,
+            role: userData.role,
+            id: userData.id
+        },
         config.refresh_token.secret,
         config.refresh_token.expiresIn
     );
@@ -42,7 +50,7 @@ const login = async (payload: IAuthLogin): Promise<ILoginResponse> => {
     return {
         accessToken,
         refreshToken,
-        needPasswordChange: userData
+        needPasswordChange: true
     };
 };
 
@@ -62,7 +70,8 @@ const refreshToken = async (token: string): Promise<Partial<ILoginResponse>> => 
     const accessToken = generateToken(
         {
             email: userData.email,
-            role: userData.role
+            role: userData.role,
+            id: userData.id
         },
         config.access_token.secret,
         config.access_token.expiresIn
@@ -70,7 +79,7 @@ const refreshToken = async (token: string): Promise<Partial<ILoginResponse>> => 
 
     return {
         accessToken,
-        needPasswordChange: userData.isPasswordChagne
+        needPasswordChange: true
     }
 }
 
@@ -116,7 +125,8 @@ const forgetPassword = async (payload: { email: string }) => {
     const resetToken = generateToken(
         {
             email: userData.email,
-            role: userData.role
+            role: userData.role,
+            id: userData.id
         },
         config.reset_token.secret,
         config.reset_token.expiresIn

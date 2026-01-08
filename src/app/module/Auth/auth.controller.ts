@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
-import httpStatus from "http-status";
-import sendResponse from "../../../utils/sendResponse";
-import catchAsync from "../../../utils/catchAsync";
-import { AuthService } from "./auth.service";
 import config from "../../../config";
+import httpStatus from "http-status";
+import { Request, Response } from "express";
+import { AuthService } from "./auth.service";
 import AppError from "../../errors/appError";
 import { IAuthUser } from "../../interface/auth";
+import catchAsync from "../../../utils/catchAsync";
+import sendResponse from "../../../utils/sendResponse";
 
 const login = catchAsync(async (req: Request, res: Response) => {
 
