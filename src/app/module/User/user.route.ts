@@ -19,7 +19,7 @@ router.post(
 
 router.post(
     "/create-vendor",
-    // auth(UserRole.ADMIN),
+    auth(UserRole.ADMIN),
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
         req.body = UserValidationSchema.createVendor.parse(JSON.parse(req.body.data))
