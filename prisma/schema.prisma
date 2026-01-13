@@ -83,7 +83,7 @@ model Customer {
 
 model Category {
   id    String @id @default(uuid())
-  title String @unique
+  title String
   icons String
 
   products Product[]
