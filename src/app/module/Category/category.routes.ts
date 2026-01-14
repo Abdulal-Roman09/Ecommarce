@@ -16,7 +16,11 @@ router.post(
         req.body = CategoryValidationSchema.createCategory.parse(JSON.parse(req.body.data))
         return CategoryController.insertIntoDB(req, res, next)
     }
+)
 
+router.delete(
+    "/:id",
+    CategoryController.deleteFromDB
 )
 
 export const CategoryRouters = router
