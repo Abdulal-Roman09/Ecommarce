@@ -1,28 +1,34 @@
 import prisma from "../../../lib/prisma";
 import sendToCloudinary from "../../../lib/sendToCloudinary";
-import { IUploadedFile } from "../../interface/file";
+import { FromDataProps } from "../../interface/FromDataProps";
 
-const insertInoDB = async (req: Request & { file?: IUploadedFile }) => {
+const insertIntoDB = async (payload: FromDataProps) => {
+    const { body, file } = payload;
 
     let fileUrl = "";
-    if (req.file) {
-        const uploaded = await sendToCloudinary(req.file);
+
+    if (file) {
+        const uploaded = await sendToCloudinary(file);
         if (uploaded?.secure_url) {
             fileUrl = uploaded.secure_url;
         }
     }
+
     const result = await prisma.category.create({
         data: {
-            title: req?.body?.title,
-            icons: fileUrl
-        }
+            title: body.title,
+            icons: fileUrl,
+        },
     });
 
     return result;
 };
 
-
+const getAllFromDB = async () => {
+    return prisma.category.findMany({});
+};
 
 export const CategoryServices = {
-    insertInoDB
+    insertIntoDB,
+    getAllFromDB,
 };

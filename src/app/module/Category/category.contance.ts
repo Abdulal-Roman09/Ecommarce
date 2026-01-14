@@ -1,6 +1,4 @@
-
 import { z } from "zod";
-
 
 export const createCategory = z.object({
   title: z.string("title is required")
@@ -8,5 +6,5 @@ export const createCategory = z.object({
 
 
 export const CategoryValidationSchema = {
-createCategory
+  createCategory
 };
