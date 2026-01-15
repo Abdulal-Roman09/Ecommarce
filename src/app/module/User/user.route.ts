@@ -9,7 +9,7 @@ const router = express.Router()
 
 router.post(
     "/create-admin",
-    // auth(UserRole.ADMIN),
+    auth(UserRole.ADMIN),
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
         req.body = UserValidationSchema.createAdmin.parse(JSON.parse(req.body.data))

@@ -86,7 +86,10 @@ model Category {
   title String
   icons String
 
-  products Product[]
+  products          Product[]
+  productCategories ProductCategory[]
+
+  @@map("categorys")
 }
 
 model Product {
@@ -100,10 +103,22 @@ model Product {
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  productCategories ProductCategory[]
 
   @@map("products")
+}
+
+model ProductCategory {
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  procductId String
+  product    Product @relation(fields: [procductId], references: [id])
+
+  @@id([procductId, categoryId])
+  @@map("produc_categorys")
 }
 
 enum UserRole {
