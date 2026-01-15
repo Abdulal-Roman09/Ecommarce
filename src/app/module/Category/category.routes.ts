@@ -1,6 +1,6 @@
 import { fileUploader } from "../../../lib/multer"
 import { CategoryController } from "./category.controller"
-import { CategoryValidationSchema } from "./category.contance"
+import { CategoryValidationSchema } from "./category.validation"
 import express, { NextFunction, Request, Response } from "express"
 
 const router = express.Router()
