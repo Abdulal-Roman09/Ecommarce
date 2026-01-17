@@ -25,7 +25,7 @@ const insertIntoDB = async (payload: FromDataProps) => {
 };
 
 const getAllFromDB = async () => {
-    return prisma.category.findMany({});
+    return prisma.category.findMany();
 };
 
 const deleteFromDB = async (id: string) => {
