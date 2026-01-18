@@ -9,12 +9,13 @@ const router = express.Router()
 
 router.get(
     "/",
-    auth(UserRole.ADMIN,UserRole.CUSTOMER,UserRole.SUPER_ADMIN),
-    CategoryController.getAllFromDB)
+    // auth(UserRole.ADMIN,UserRole.CUSTOMER,UserRole.SUPER_ADMIN),
+    CategoryController.getAllFromDB
+)
 
 router.post(
     "/create-category",
-    auth(UserRole.ADMIN),
+    // auth(UserRole.ADMIN),
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
         req.body = CategoryValidationSchema.createCategory.parse(JSON.parse(req.body.data))
@@ -24,7 +25,7 @@ router.post(
 
 router.delete(
     "/:id",
-    auth(UserRole.ADMIN),
+    // auth(UserRole.ADMIN),
     CategoryController.deleteFromDB
 
 )

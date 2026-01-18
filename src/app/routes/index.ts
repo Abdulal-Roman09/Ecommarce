@@ -3,6 +3,8 @@ import { UserRoutes } from '../module/User/user.route'
 import { AuthRoutes } from '../module/Auth/auth.route'
 import { CategoryRouters } from '../module/Category/category.routes'
 import { ProductRouters } from '../module/Product/product.route'
+import { VendorRoutes } from '../module/vendor/vendor.routes'
+
 
 const router = exprsss.Router()
 
@@ -22,6 +24,10 @@ const moduleRoutes = [
     {
         path: '/product',
         route: ProductRouters
+    },
+    {
+        path: '/vendor',
+        route: VendorRoutes
     },
 ]
 
