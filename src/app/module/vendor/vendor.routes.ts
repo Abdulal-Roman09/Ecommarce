@@ -13,4 +13,9 @@ router.delete(
     VendorController.deleteFromDB
 );
 
+router.delete(
+    "/soft-delete/:id",
+    VendorController.softDeleteFromDB
+);
+
 export const VendorRoutes = router;

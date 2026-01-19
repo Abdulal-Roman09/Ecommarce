@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, UserStatus } from "@prisma/client";
 import prisma from "../../../lib/prisma";
 import { vendorSearchableFields } from "./vendor.constance";
 import { calculatePagination, IOptions } from "../../../lib/paginationHealper";
@@ -73,7 +73,34 @@ const deleteFromDB = async (id: string) => {
     })
 };
 
+const softDeleteFromDB = async (id: string) => {
+    const user = await prisma.vendor.findUniqueOrThrow({ where: { id } })
+
+    return await prisma.$transaction(async tx => {
+
+        const deltedVendor = await tx.vendor.update({
+            where: {
+                email: user.email
+
+            },
+            data: {
+                isDelete: true
+            }
+        })
+        await tx.user.update({
+            where: {
+                email: user.email
+            },
+            data: {
+                status: UserStatus.BLOCKED
+            }
+        })
+        return deltedVendor
+    })
+};
+
 export const VendorServices = {
     getAllFromDB,
     deleteFromDB,
+    softDeleteFromDB
 };

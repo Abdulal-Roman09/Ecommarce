@@ -35,7 +35,21 @@ const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const softDeleteFromDB = catchAsync(async (req: Request, res: Response) => {
+
+    const { id } = req.params;
+    const result = await VendorServices.softDeleteFromDB(id as string);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Vendor is soft Delted successfully",
+        data: result,
+    });
+});
+
 export const VendorController = {
     getAllFromDB,
     deleteFromDB,
+    softDeleteFromDB
 };
