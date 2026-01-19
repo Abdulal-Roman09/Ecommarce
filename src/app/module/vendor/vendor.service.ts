@@ -60,9 +60,17 @@ const getAllFromDB = async (params: any, options: IOptions) => {
 };
 
 const deleteFromDB = async (id: string) => {
-    return prisma.vendor.delete({
-        where: { id },
-    });
+    const user = await prisma.vendor.findUniqueOrThrow({ where: { id } })
+
+    return await prisma.$transaction(async tx => {
+
+        await tx.vendor.delete({
+            where: { email: user.email }
+        })
+        await tx.user.delete({
+            where: { email: user.email }
+        })
+    })
 };
 
 export const VendorServices = {

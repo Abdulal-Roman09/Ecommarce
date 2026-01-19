@@ -55,10 +55,23 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params
+    const result = await UserService.deleteFromDB(id as string)
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Users delete successfully",
+        data: result
+    });
+});
+
 
 export const UserController = {
     createAdmin,
     createVendor,
     createCustomer,
-    getAllFromDB
+    getAllFromDB,
+    deleteFromDB
 }

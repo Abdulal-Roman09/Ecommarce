@@ -12,6 +12,7 @@ router.get(
     UserController.getAllFromDB
 )
 
+
 router.post(
     "/create-admin",
     // auth(UserRole.ADMIN),
@@ -41,5 +42,9 @@ router.post(
     }
 )
 
+router.delete(
+    "/:id",
+    UserController.deleteFromDB
+)
 
 export const UserRoutes = router

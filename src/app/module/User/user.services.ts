@@ -186,9 +186,16 @@ const getAllFromDB = async (params: any, options: any) => {
     }
 }
 
+const deleteFromDB = async (id: string) => {
+
+
+    
+}
+
 export const UserService = {
     createAdmin,
     createVendor,
     createCustomer,
-    getAllFromDB
+    getAllFromDB,
+    deleteFromDB
 }
