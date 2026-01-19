@@ -1,22 +1,29 @@
 import httpStatus from "http-status";
+import pick from "../../../lib/pick";
 import { Request, Response } from "express";
 import { VendorServices } from "./vendor.service";
 import catchAsync from "../../../utils/catchAsync";
 import sendResponse from "../../../utils/sendResponse";
+import { userFilterabaleFileds } from "./vendor.constance";
+import { paginationHealperOptions } from "../../../lib/paginationHealper";
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
-    const result = await VendorServices.getAllFromDB();
+
+    const filter = pick(req.query, userFilterabaleFileds)
+    const options = pick(req.query, paginationHealperOptions)
+    const result = await VendorServices.getAllFromDB(filter, options)
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         message: "Vendors fetched successfully",
-        data: result,
+        meta: result.meta,
+        data: result.data
     });
 });
 
 const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
-    
+
     const { id } = req.params;
     const result = await VendorServices.deleteFromDB(id as string);
 
