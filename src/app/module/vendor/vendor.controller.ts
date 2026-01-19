@@ -4,12 +4,12 @@ import { Request, Response } from "express";
 import { VendorServices } from "./vendor.service";
 import catchAsync from "../../../utils/catchAsync";
 import sendResponse from "../../../utils/sendResponse";
-import { userFilterabaleFileds } from "./vendor.constance";
 import { paginationHealperOptions } from "../../../lib/paginationHealper";
+import { vendorFilterableFields } from "./vendor.constance";
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
 
-    const filter = pick(req.query, userFilterabaleFileds)
+    const filter = pick(req.query, vendorFilterableFields)
     const options = pick(req.query, paginationHealperOptions)
     const result = await VendorServices.getAllFromDB(filter, options)
 

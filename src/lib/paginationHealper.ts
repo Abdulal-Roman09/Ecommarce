@@ -1,35 +1,43 @@
 export type IOptions = {
-    page?: number,
-    limit?: number,
-    sortBy?: string,
-    sortOrder?: string
+    page?: number
+    limit?: number
+    sortBy?: string
+    sortOrder?: "asc" | "desc"
 }
 
 type IOptionsResult = {
-    page: number;
-    limit: number;
-    skip: number;
-    sortBy: string,
-    sortOrder: string
+    page: number
+    limit: number
+    skip: number
+    sortBy: string
+    sortOrder: "asc" | "desc"
 }
 
 export const calculatePagination = (options: IOptions): IOptionsResult => {
-    const page: number = Number(options.page) || 1
-    const limit: number = Number(options.limit) || 10
-    const skip: number = Number((page) - 1) * limit
+    const page = Number(options.page) || 1
+    const limit = Number(options.limit) || 10
+    const skip = (page - 1) * limit
 
-    const sortBy: string = options.sortBy || "createdAt"
-    const sortOrder: string = options.sortOrder || "decs"
+    const sortBy = options.sortBy || "createdAt"
 
+    const sortOrder: "asc" | "desc" =
+        options.sortOrder === "asc" || options.sortOrder === "desc"
+            ? options.sortOrder
+            : "desc"
 
     return {
         page,
         limit,
         skip,
+        sortBy,
         sortOrder,
-        sortBy
     }
 }
 
 
-export const paginationHealperOptions = ["page", "limit", "sortBy", "sortOrder"]
+export const paginationHealperOptions = [
+    "page",
+    "limit",
+    "sortBy",
+    "sortOrder",
+]

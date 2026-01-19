@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../../../lib/prisma";
-import { userSearchableFileds } from "./vendor.constance";
+import { vendorSearchableFields } from "./vendor.constance";
 import { calculatePagination, IOptions } from "../../../lib/paginationHealper";
 
 const getAllFromDB = async (params: any, options: IOptions) => {
@@ -11,7 +11,7 @@ const getAllFromDB = async (params: any, options: IOptions) => {
 
     if (searchTerm) {
         andConditions.push({
-            OR: userSearchableFileds.map(field => ({
+            OR: vendorSearchableFields.map(field => ({
                 [field]: {
                     contains: searchTerm,
                     mode: "insnsitive"

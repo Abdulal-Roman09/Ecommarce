@@ -1,8 +1,11 @@
+import pick from "../../../lib/pick";
 import httpStatus from "http-status";
 import { Request, Response } from "express";
 import { UserService } from "./user.services";
 import catchAsync from "../../../utils/catchAsync";
 import sendResponse from "../../../utils/sendResponse";
+import { userFilterableFields } from "./user.constance";
+import { paginationHealperOptions } from "../../../lib/paginationHealper";
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
 
@@ -37,9 +40,25 @@ const createCustomer = catchAsync(async (req: Request, res: Response) => {
     });
 })
 
+const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
+    const filter = pick(req.query, userFilterableFields)
+    const options = pick(req.query, paginationHealperOptions)
+
+    const result = await UserService.getAllFromDB(filter, options)
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Users fetched successfully",
+        meta: result.meta,
+        data: result.result
+    });
+});
+
 
 export const UserController = {
     createAdmin,
     createVendor,
-    createCustomer
+    createCustomer,
+    getAllFromDB
 }

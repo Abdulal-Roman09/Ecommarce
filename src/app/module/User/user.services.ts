@@ -3,8 +3,10 @@ import { Request } from "express"
 import config from "../../../config"
 import prisma from "../../../lib/prisma"
 import { IUploadedFile } from "../../interface/file"
+import { userSearchableFields } from "./user.constance"
 import sendToCloudinary from "../../../lib/sendToCloudinary"
-import { Admin, Customer, UserRole, Vendor } from "@prisma/client"
+import { calculatePagination } from "../../../lib/paginationHealper"
+import { Admin, Customer, Prisma, UserRole, Vendor } from "@prisma/client"
 
 const createAdmin = async (req: Request): Promise<Admin> => {
 
@@ -116,14 +118,77 @@ const createCustomer = async (req: Request): Promise<Customer> => {
             ...customerData,
             user: userWithoutPassword
         };
-        return customerData
     })
 
     return result
 }
 
+const getAllFromDB = async (params: any, options: any) => {
+    const { skip, limit, page, sortBy, sortOrder } = calculatePagination(options)
+    const { searchTerm, ...filterData } = params
+
+    const andConditions: Prisma.UserWhereInput[] = []
+
+    if (searchTerm) {
+        andConditions.push({
+            OR: userSearchableFields.map((field) => ({
+                [field]: {
+                    contains: searchTerm,
+                    mode: "insensitive",
+                },
+            })),
+        });
+    }
+
+    if (Object.keys(filterData).length > 0) {
+        andConditions.push({
+            AND: Object.keys(filterData).map(key => ({
+                [key]: {
+                    equals: (filterData as any)[key]
+                }
+            }))
+        })
+    }
+
+    const whereConditions: Prisma.UserWhereInput = andConditions.length > 0 ?
+        { AND: andConditions } : {}
+
+
+    const result = await prisma.user.findMany({
+        skip,
+        take: limit,
+        where: whereConditions,
+        select: {
+            id: true,
+            email: true,
+            role: true,
+            status: true,
+            createdAt: true,
+            updatedAt: true,
+            vendor: true,
+            admin: true,
+            customer: true
+        },
+        orderBy: sortBy
+            ? { [sortBy]: sortOrder }
+            : { createdAt: "desc" },
+    })
+
+    const total = await prisma.user.count({ where: whereConditions })
+
+    return {
+        meta: {
+            page,
+            total,
+            limit,
+        },
+        result
+    }
+}
+
 export const UserService = {
     createAdmin,
     createVendor,
-    createCustomer
+    createCustomer,
+    getAllFromDB
 }

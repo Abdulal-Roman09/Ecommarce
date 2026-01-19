@@ -1,2 +1,2 @@
-export const userSearchableFileds = ["email"]
-export const userFilterabaleFileds = ["gender", "role", "status", "email"]
+export const vendorSearchableFields = ["email", "name"]
+export const vendorFilterableFields = ["gender", "role", "status"]
