@@ -35,6 +35,19 @@ const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const updateFromDB = catchAsync(async (req: Request, res: Response) => {
+
+    const { id } = req.params;
+    const result = await VendorServices.updateFromDB(id as string, req.body);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Vendor is Updated successfully",
+        data: result,
+    });
+});
+
 const softDeleteFromDB = catchAsync(async (req: Request, res: Response) => {
 
     const { id } = req.params;
@@ -50,6 +63,7 @@ const softDeleteFromDB = catchAsync(async (req: Request, res: Response) => {
 
 export const VendorController = {
     getAllFromDB,
+    updateFromDB,
     deleteFromDB,
     softDeleteFromDB
 };

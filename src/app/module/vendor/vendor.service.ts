@@ -59,6 +59,10 @@ const getAllFromDB = async (params: any, options: IOptions) => {
     }
 };
 
+const updateFromDB = async (id: string, payload: any) => {
+
+};
+
 const deleteFromDB = async (id: string) => {
     const user = await prisma.vendor.findUniqueOrThrow({ where: { id } })
 
@@ -101,6 +105,7 @@ const softDeleteFromDB = async (id: string) => {
 
 export const VendorServices = {
     getAllFromDB,
+    updateFromDB,
     deleteFromDB,
     softDeleteFromDB
 };

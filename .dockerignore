@@ -1,0 +1,17 @@
+node_modules
+pnpm-store
+.pnpm-store
+
+.env
+.env.*
+.git
+.gitignore
+
+Dockerfile
+docker-compose.yml
+
+dist
+build
+
+npm-debug.log
+pnpm-debug.log

@@ -13,6 +13,11 @@ router.delete(
     VendorController.deleteFromDB
 );
 
+router.patch(
+    "/update/:id",
+    VendorController.updateFromDB
+);
+
 router.delete(
     "/soft-delete/:id",
     VendorController.softDeleteFromDB

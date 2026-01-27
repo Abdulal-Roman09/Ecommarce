@@ -1,8 +1,8 @@
-import express, { Application, Request, Response } from 'express';
-import cookieParser from 'cookie-parser';
 import router from './app/routes';
-import globalErrorHandler from './app/middleware/globalErrorHandler';
+import cookieParser from 'cookie-parser';
 import routerNotFound from './app/middleware/routerNotFound';
+import express, { Application, Request, Response } from 'express';
+import globalErrorHandler from './app/middleware/globalErrorHandler';
 
 const app: Application = express();
 
