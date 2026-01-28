@@ -129,8 +129,21 @@ model Inventory {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   histories History[]
+  hlws      Hlw[]
 
   @@map("inventories")
+}
+
+model Hlw {
+  id          String     @id @default(uuid())
+  name        String
+  age         Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  inventory   Inventory? @relation(fields: [inventoryId], references: [id])
+  inventoryId String?
+
+  @@map("hlws")
 }
 
 model History {

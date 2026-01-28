@@ -11,7 +11,7 @@
     "dev": "ts-node-dev --respawn --transpile-only --watch src --poll ./src/server.ts",
     "migrate": "pnpm prisma migrate dev",
     "reset": "pnpm prisma migrate reset",
-    "studio": "pnpm prisma studio",
+    "studio": "prisma studio --port 5555 --hostname 0.0.0.0",
     "generate": "pnpm prisma generate"
   },
   "dependencies": {
