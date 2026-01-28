@@ -5,6 +5,8 @@ const insertIntoDB = async (payload: any) => {
         const createInventory = await tx.inventory.create({
             data: payload
         })
+
+        await tx.history
         
 
     });
