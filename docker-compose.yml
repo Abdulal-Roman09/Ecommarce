@@ -53,8 +53,8 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./src:/app/src
-      - ./uploads:/app/uploads
+      - .:/app
+      - /app/node_modules
     networks:
       - ecommerce-network
 

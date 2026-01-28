@@ -121,6 +121,34 @@ model ProductCategory {
   @@map("produc_categorys")
 }
 
+model Inventory {
+  id        String    @id @default(uuid())
+  sku       String    @unique
+  productId String    @unique
+  quantity  Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  histories History[]
+
+  @@map("inventories")
+}
+
+model History {
+  id              String     @id @default(uuid())
+  actionType      ActionType
+  quantityChanged Int
+  lastQuantity    Int
+  newQuantity     Int
+
+  inventoryId String
+  inventory   Inventory @relation(fields: [inventoryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("histories")
+}
+
 enum UserRole {
   SUPER_ADMIN
   ADMIN
@@ -136,4 +164,9 @@ enum UserStatus {
 enum Gender {
   MALE
   FEMALE
+}
+
+enum ActionType {
+  IN
+  OUT
 }

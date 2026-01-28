@@ -9,6 +9,15 @@ pnpm-store
 
 Dockerfile
 docker-compose.yml
+node_modules
+.git
+.gitignore
+.env
+.env.*
+dist
+build
+coverage
+
 
 dist
 build
