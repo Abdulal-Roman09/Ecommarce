@@ -8,6 +8,11 @@ router.get(
     VendorController.getAllFromDB
 );
 
+router.get(
+    "/:id",
+    VendorController.getByIdFromDB
+);
+
 router.delete(
     "/:id",
     VendorController.deleteFromDB

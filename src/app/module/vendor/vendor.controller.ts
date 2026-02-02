@@ -22,6 +22,19 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
+
+    const { id } = req.params
+    const result = await VendorServices.getByIdFromDB(id as string)
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Single Vendors fetched successfully",
+        data: result
+    });
+});
+
 const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
 
     const { id } = req.params;
@@ -63,6 +76,7 @@ const softDeleteFromDB = catchAsync(async (req: Request, res: Response) => {
 
 export const VendorController = {
     getAllFromDB,
+    getByIdFromDB,
     updateFromDB,
     deleteFromDB,
     softDeleteFromDB

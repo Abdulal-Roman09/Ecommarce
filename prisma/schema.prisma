@@ -52,13 +52,13 @@ model Vendor {
   contactNumber String
   gender        Gender
   address       String
-
-  rating Float @default(0)
-
-  isVerified Boolean  @default(false)
-  isDelete   Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  rating        Float      @default(0)
+  isVerified    Boolean    @default(false)
+  isDelete      Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  shops         Shop[]
+  categories    Category[]
 
   @@map("vendors")
 }
@@ -88,6 +88,7 @@ model Category {
 
   products          Product[]
   productCategories ProductCategory[]
+  vendors           Vendor[]
 
   @@map("categorys")
 }
@@ -103,9 +104,13 @@ model Product {
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
 
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id])
+
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   productCategories ProductCategory[]
+  inventory         Inventory?
 
   @@map("products")
 }
@@ -121,10 +126,35 @@ model ProductCategory {
   @@map("produc_categorys")
 }
 
+model Shop {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String? @db.Text
+  logo        String?
+  banner      String?
+  email       String  @unique
+  phone       String?
+  address     String?
+  isActive    Boolean @default(true)
+  isVerified  Boolean @default(false)
+
+  vendorId String?
+  vendor   Vendor? @relation(fields: [vendorId], references: [id])
+
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("shops")
+}
+
 model Inventory {
-  id        String    @id @default(uuid())
-  sku       String    @unique
-  productId String    @unique
+  id  String @id @default(uuid())
+  sku String @unique
+
+  productId String?  @unique
+  product   Product? @relation(fields: [productId], references: [id])
+
   quantity  Int
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
