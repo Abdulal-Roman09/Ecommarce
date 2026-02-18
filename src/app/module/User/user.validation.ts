@@ -22,6 +22,7 @@ const createVendor = z.object({
         address: z.string().nonempty("Address is required!"),
         gender: z.enum([Gender.MALE, Gender.FEMALE], { message: "gender is required" }),
         profilePhoto: z.string().optional(),
+        categoryIds: z.array(z.string()).optional(),
     })
 })
 

@@ -70,10 +70,23 @@ const createVendor = async (req: Request): Promise<Vendor> => {
             data: userData
         })
 
+        const vendorPayload: any = { ...req.body.vendor }
+        const categoryIds = vendorPayload.categoryIds
+        if (categoryIds) delete vendorPayload.categoryIds
+
+        const createData: any = { ...vendorPayload }
+        if (categoryIds) {
+            const connect = Array.isArray(categoryIds)
+                ? categoryIds.map((id: string) => ({ id }))
+                : [{ id: categoryIds }]
+            createData.categories = { connect }
+        }
+
         const vendorData = await tx.vendor.create({
-            data: req.body.vendor,
+            data: createData,
             include: {
-                user: true
+                user: true,
+                categories: true
             }
         })
         const { password, ...userWithoutPassword } = vendorData.user;
@@ -188,8 +201,6 @@ const getAllFromDB = async (params: any, options: any) => {
 
 const deleteFromDB = async (id: string) => {
 
-
-    
 }
 
 export const UserService = {

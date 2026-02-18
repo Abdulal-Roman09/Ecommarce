@@ -4,8 +4,8 @@ import { Request, Response } from "express";
 import { VendorServices } from "./vendor.service";
 import catchAsync from "../../../utils/catchAsync";
 import sendResponse from "../../../utils/sendResponse";
-import { paginationHealperOptions } from "../../../lib/paginationHealper";
 import { vendorFilterableFields } from "./vendor.constance";
+import { paginationHealperOptions } from "../../../lib/paginationHealper";
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
 
