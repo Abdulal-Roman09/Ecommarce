@@ -29,7 +29,7 @@ const login = catchAsync(async (req: Request, res: Response) => {
         message: "Logged in successfully!",
         data: {
             accessToken: result.accessToken,
-            refreshToken:refreshToken,
+            refreshToken: refreshToken,
             needPasswordChange: result.needPasswordChange
         }
     });
@@ -83,11 +83,26 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
     });
 })
 
+const getMe = catchAsync(async (req: Request, res: Response) => {
+    const token = req.headers.authorization;
+
+    const result = await AuthService.getMe(token as string);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "User retrieved successfully",
+        data: result,
+    });
+});
+
+
 
 export const AuthController = {
     login,
     refreshToken,
     changePassword,
     forgetPassword,
-    resetPassword
+    resetPassword,
+    getMe
 };

@@ -32,5 +32,17 @@ route.post(
     AuthController.resetPassword
 )
 
+route.get(
+    "/get-me",
+    auth(
+        UserRole.ADMIN,
+        UserRole.CUSTOMER,
+        UserRole.SUPER_ADMIN,
+        UserRole.VENDOR
+    ),
+    AuthController.getMe
+);
+
+
 
 export const AuthRoutes = route

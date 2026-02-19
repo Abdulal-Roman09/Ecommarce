@@ -11,6 +11,7 @@ import emailSender from "../../../lib/emailSender";
 import { IAuthLogin, IAuthUser } from "../../interface/auth";
 import { IChangePassword, ILoginResponse } from "./auth.interfact";
 import { generateToken, verifyToken } from "../../../lib/jwtTokenGenerate&Verify";
+import { tuple } from 'zod';
 
 const login = async (payload: IAuthLogin): Promise<ILoginResponse> => {
 
@@ -173,10 +174,81 @@ const resetPassword = async (token: string, payload: any) => {
         message: "password is reset successfully"
     }
 }
+
+const getMe = async (user: any) => {
+    const accessToken = user.accessToken;
+    const decodedData = verifyToken(accessToken, config.access_token.secret)
+
+    const userData = await prisma.user.findFirstOrThrow({
+        where: {
+            email: decodedData.email,
+            status: UserStatus.ACTIVE,
+        },
+        select: {
+            id: true,
+            email: true,
+            role: true,
+            status: true,
+            createdAt: true,
+            updatedAt: true,
+
+            admin: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                    profilePhoto: true,
+                    address: true,
+                    isDelete: true,
+                    contactNumber: true,
+                    status: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
+            },
+
+            vendor: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                    profilePhoto: true,
+                    address: true,
+                    isDelete: true,
+                    contactNumber: true,
+                    status: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    categories: true,
+                },
+            },
+
+            customer: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    profilePhoto: true,
+                    contactNumber: true,
+                    address: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
+            },
+        },
+    });
+
+    return userData;
+};
+
+
 export const AuthService = {
     login,
     refreshToken,
     changePassword,
     forgetPassword,
-    resetPassword
+    resetPassword,
+    getMe
 };
