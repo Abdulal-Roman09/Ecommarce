@@ -6,7 +6,7 @@ export const createProduct = z.object({
         brand: z.string({ message: "Brand is required", }),
         description: z.string().optional(),
         basePrice: z.number({ message: "Base price must be a positive number" }).positive(),
-        image: z.string().url("Invalid image URL").optional(),
+        image: z.string().optional(),
         categoryId: z.string({ message: "Category ID is required" })
     })
 });
