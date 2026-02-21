@@ -20,6 +20,7 @@ model User {
   admin    Admin?
   vendor   Vendor?
   customer Customer?
+  payments Payment[]
 
   @@map("users")
 }
@@ -144,6 +145,7 @@ model Shop {
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  payments  Payment[]
 
   @@map("shops")
 }
@@ -179,6 +181,28 @@ model History {
   @@map("histories")
 }
 
+model Payment {
+  id                 String        @id @default(uuid())
+  amount             Float
+  transactionId      String        @unique
+  productId          String
+  paymentGatewayDate Json?
+  currency           String        @default("BDT")
+  status             PaymentStatus @default(UNPAID)
+  paidAt             DateTime?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("payments")
+}
+
 enum UserRole {
   SUPER_ADMIN
   ADMIN
@@ -199,4 +223,9 @@ enum Gender {
 enum ActionType {
   IN
   OUT
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
 }
