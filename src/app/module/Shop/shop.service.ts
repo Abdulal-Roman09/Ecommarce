@@ -1,9 +1,13 @@
 import prisma from "../../../lib/prisma";
 import { IUploadedFile } from "../../interface/file";
 import sendToCloudinary from "../../../lib/sendToCloudinary";
+import AppError from "../../errors/appError";
+import httpStatus from "http-status";
 
 const insertIntoDB = async (payload: any) => {
-    const files = payload?.files as IUploadedFile[]
+    const files = payload?.files as IUploadedFile[];
+    const body = payload?.body;
+    console.log("data:", body)
 
     let logoUrl = "";
     let bannerUrl = "";
@@ -18,15 +22,30 @@ const insertIntoDB = async (payload: any) => {
         if (uploadedBanner?.secure_url) bannerUrl = uploadedBanner.secure_url;
     }
 
+    // Check duplicate shop name (unique constraint)
+    if (!body || !body.name) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Shop name is required");
+    }
+
+    const existing = await prisma.shop.findUnique({ where: { name: body.name } });
+    if (existing) {
+        throw new AppError(httpStatus.CONFLICT, "Shop name already exists");
+    }
+
+    // Prisma call: creating the shop
     const result = await prisma.shop.create({
         data: {
-            ...payload?.body.Shop,
+            name: body.name,
+            description: body.description,
+            email: body.email,
+            phone: body.phone,
+            address: body.address,
+            vendorId: body.vendorId,
             logo: logoUrl,
             banner: bannerUrl,
         },
     });
 
-    console.log(result);
     return result;
 };
 
