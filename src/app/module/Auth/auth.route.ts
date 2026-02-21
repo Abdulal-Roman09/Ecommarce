@@ -34,12 +34,7 @@ route.post(
 
 route.get(
     "/get-me",
-    auth(
-        UserRole.ADMIN,
-        UserRole.CUSTOMER,
-        UserRole.SUPER_ADMIN,
-        UserRole.VENDOR
-    ),
+    auth(UserRole.ADMIN, UserRole.CUSTOMER, UserRole.SUPER_ADMIN, UserRole.VENDOR),
     AuthController.getMe
 );
 

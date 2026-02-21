@@ -1,7 +1,7 @@
-import express, { NextFunction, Request, Response } from 'express'
-import { ProductController } from "./product.controller"
 import { fileUploader } from '../../../lib/multer'
+import { ProductController } from "./product.controller"
 import { ProductValidationSchema } from './product.validation'
+import express, { NextFunction, Request, Response } from 'express'
 
 const router = express.Router()
 
