@@ -21,6 +21,7 @@ model User {
   vendor   Vendor?
   customer Customer?
   payments Payment[]
+  orders   Order[]
 
   @@map("users")
 }
@@ -112,6 +113,7 @@ model Product {
   updatedAt         DateTime          @updatedAt
   productCategories ProductCategory[]
   inventory         Inventory?
+  orderItems        OrderItem[]
 
   @@map("products")
 }
@@ -146,6 +148,7 @@ model Shop {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   payments  Payment[]
+  orders    Order[]
 
   @@map("shops")
 }
@@ -182,14 +185,12 @@ model History {
 }
 
 model Payment {
-  id                 String        @id @default(uuid())
-  amount             Float
-  transactionId      String        @unique
-  productId          String
-  paymentGatewayDate Json?
-  currency           String        @default("BDT")
-  status             PaymentStatus @default(UNPAID)
-  paidAt             DateTime?
+  id            String @id @default(uuid())
+  amount        Float
+  transactionId String @unique
+
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id])
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
@@ -197,10 +198,63 @@ model Payment {
   shopId String
   shop   Shop   @relation(fields: [shopId], references: [id])
 
+  currency String        @default("BDT")
+  status   PaymentStatus @default(PENDING)
+
+  paymentGatewayData Json?
+  paidAt             DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("payments")
+}
+
+model Order {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id])
+
+  totalAmount Float
+  discount    Float @default(0)
+  shippingFee Float @default(0)
+  grandTotal  Float
+
+  status        OrderStatus   @default(PENDING)
+  paymentStatus PaymentStatus @default(PENDING)
+
+  shippingAddress Json
+  billingAddress  Json?
+
+  orderItems OrderItem[]
+  payment    Payment?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id String @id @default(uuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity Int
+  price    Float
+  total    Float
+
+  createdAt DateTime @default(now())
+
+  @@map("order_items")
 }
 
 enum UserRole {
@@ -226,6 +280,17 @@ enum ActionType {
 }
 
 enum PaymentStatus {
-  UNPAID
+  PENDING
   PAID
+  FAILED
+  REFUNDED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
