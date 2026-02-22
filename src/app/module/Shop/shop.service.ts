@@ -49,6 +49,29 @@ const insertIntoDB = async (payload: any) => {
     return result;
 };
 
+const getAllFromDB = async () => {
+    return await prisma.shop.findMany()
+}
+
+const softDeleteFromDB = async (id: string) => {
+
+    await prisma.shop.findUniqueOrThrow({
+        where: {
+            id
+        }
+    })
+    const result = await prisma.shop.update({
+
+        where: { id },
+        data: {
+            isActive: false
+        }
+    })
+    return result
+}
+
 export const ShopServices = {
     insertIntoDB,
+    getAllFromDB,
+    softDeleteFromDB
 };

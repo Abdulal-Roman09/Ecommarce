@@ -17,6 +17,32 @@ const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
+    const result = await ShopServices.getAllFromDB();
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Shops retrieved successfully.",
+        data: result,
+    });
+});
+
+const softDeleteFromDB = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const result = await ShopServices.softDeleteFromDB(id as string);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Shop deleted successfully.",
+        data: result,
+    });
+});
+
 export const ShopController = {
-    insertIntoDB
+    insertIntoDB,
+    getAllFromDB,
+    softDeleteFromDB
 };

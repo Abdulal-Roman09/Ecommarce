@@ -18,4 +18,14 @@ router.post(
     }
 );
 
+router.get(
+    '/',
+    ShopController.getAllFromDB
+);
+
+router.delete(
+    '/soft-delete/:id',
+    ShopController.softDeleteFromDB
+);
+
 export const ShopRouters = router;
