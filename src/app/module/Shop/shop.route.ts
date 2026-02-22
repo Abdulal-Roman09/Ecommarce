@@ -20,12 +20,32 @@ router.post(
 
 router.get(
     '/',
+    auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
     ShopController.getAllFromDB
+);
+
+router.get(
+    '/:id',
+    auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.CUSTOMER, UserRole.VENDOR),
+    ShopController.getSingleFromDB
 );
 
 router.delete(
     '/soft-delete/:id',
+    auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
     ShopController.softDeleteFromDB
+);
+
+router.put(
+    '/verifed/:id',
+    auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+    ShopController.verifedShop
+);
+
+router.put(
+    '/blocked/:id',
+    auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+    ShopController.blockedShop
 );
 
 export const ShopRouters = router;

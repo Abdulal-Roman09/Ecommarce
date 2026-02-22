@@ -28,6 +28,18 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getSingleFromDB = catchAsync(async (req: Request, res: Response) => {
+    const {id}=req.params
+    const result = await ShopServices.getSingleFromDB(id as string);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Shops retrieved successfully.",
+        data: result,
+    });
+});
+
 const softDeleteFromDB = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
 
@@ -41,8 +53,37 @@ const softDeleteFromDB = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const verifedShop = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const result = await ShopServices.verifedShop(id as string);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Shop verifed successfully.",
+        data: result,
+    });
+});
+
+const blockedShop = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const result = await ShopServices.blockedShop(id as string);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Shop is blocked successfully.",
+        data: result,
+    });
+});
+
 export const ShopController = {
     insertIntoDB,
     getAllFromDB,
-    softDeleteFromDB
+    getSingleFromDB,
+    verifedShop,
+    blockedShop,
+    softDeleteFromDB,
 };

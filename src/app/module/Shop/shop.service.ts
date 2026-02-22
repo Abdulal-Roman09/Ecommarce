@@ -1,8 +1,8 @@
+import httpStatus from "http-status";
 import prisma from "../../../lib/prisma";
+import AppError from "../../errors/appError";
 import { IUploadedFile } from "../../interface/file";
 import sendToCloudinary from "../../../lib/sendToCloudinary";
-import AppError from "../../errors/appError";
-import httpStatus from "http-status";
 
 const insertIntoDB = async (payload: any) => {
     const files = payload?.files as IUploadedFile[];
@@ -22,7 +22,6 @@ const insertIntoDB = async (payload: any) => {
         if (uploadedBanner?.secure_url) bannerUrl = uploadedBanner.secure_url;
     }
 
-    // Check duplicate shop name (unique constraint)
     if (!body || !body.name) {
         throw new AppError(httpStatus.BAD_REQUEST, "Shop name is required");
     }
@@ -32,7 +31,6 @@ const insertIntoDB = async (payload: any) => {
         throw new AppError(httpStatus.CONFLICT, "Shop name already exists");
     }
 
-    // Prisma call: creating the shop
     const result = await prisma.shop.create({
         data: {
             name: body.name,
@@ -53,6 +51,14 @@ const getAllFromDB = async () => {
     return await prisma.shop.findMany()
 }
 
+const getSingleFromDB = async (id: string) => {
+
+    const result = await prisma.shop.findFirstOrThrow({
+        where: { id, isActive: true }
+    })
+    return result
+}
+
 const softDeleteFromDB = async (id: string) => {
 
     await prisma.shop.findUniqueOrThrow({
@@ -70,8 +76,36 @@ const softDeleteFromDB = async (id: string) => {
     return result
 }
 
+const verifedShop = async (id: string) => {
+
+    await prisma.shop.findUniqueOrThrow({ where: { id } })
+    const result = await prisma.shop.update({
+        where: { id },
+        data: {
+            isVerified: true,
+        },
+    })
+    return result
+}
+
+const blockedShop = async (id: string) => {
+
+    await prisma.shop.findUniqueOrThrow({ where: { id } })
+    const result = await prisma.shop.update({
+        where: { id },
+        data: {
+            isActive: false,
+            isVerified: false,
+        },
+    })
+    return result
+}
+
 export const ShopServices = {
     insertIntoDB,
     getAllFromDB,
-    softDeleteFromDB
+    getSingleFromDB,
+    softDeleteFromDB,
+    verifedShop,
+    blockedShop
 };
