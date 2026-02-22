@@ -30,6 +30,17 @@ router.get(
     ShopController.getSingleFromDB
 );
 
+router.patch(
+    '/update/:id',
+    fileUploader.upload.array('file', 2),
+    auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.VENDOR),
+    (req, res, next) => {
+        const validatedData = ShopValidationSchema.updateSchema.parse(JSON.parse(req.body.data));
+        req.body = validatedData;
+        return ShopController.updateFromDB(req, res, next);
+    }
+);
+
 router.delete(
     '/soft-delete/:id',
     auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),

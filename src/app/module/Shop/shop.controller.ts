@@ -29,13 +29,25 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getSingleFromDB = catchAsync(async (req: Request, res: Response) => {
-    const {id}=req.params
+    const { id } = req.params
     const result = await ShopServices.getSingleFromDB(id as string);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         message: "Shops retrieved successfully.",
+        data: result,
+    });
+});
+
+const updateFromDB = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params
+    const result = await ShopServices.updateFromDB(id as string, req as FromDataProps);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Shops update successfully.",
         data: result,
     });
 });
@@ -83,6 +95,7 @@ export const ShopController = {
     insertIntoDB,
     getAllFromDB,
     getSingleFromDB,
+    updateFromDB,
     verifedShop,
     blockedShop,
     softDeleteFromDB,

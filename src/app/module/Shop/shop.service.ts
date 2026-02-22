@@ -3,8 +3,9 @@ import prisma from "../../../lib/prisma";
 import AppError from "../../errors/appError";
 import { IUploadedFile } from "../../interface/file";
 import sendToCloudinary from "../../../lib/sendToCloudinary";
+import { FromDataProps } from "../../interface/FromDataProps";
 
-const insertIntoDB = async (payload: any) => {
+const insertIntoDB = async (payload: FromDataProps) => {
     const files = payload?.files as IUploadedFile[];
     const body = payload?.body;
     console.log("data:", body)
@@ -59,6 +60,62 @@ const getSingleFromDB = async (id: string) => {
     return result
 }
 
+const updateFromDB = async (id: string, payload: any) => {
+    const { files, body } = payload;
+
+    const shop = await prisma.shop.findUniqueOrThrow({ where: { id } });
+
+    if (!shop || shop.isActive === false) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Shop not found or inactive");
+    }
+
+    // If name is being changed, ensure it's not already used by another shop
+    if (body?.name && body.name !== shop.name) {
+        const existing = await prisma.shop.findUnique({ where: { name: body.name } });
+        if (existing && existing.id !== id) {
+            throw new AppError(httpStatus.CONFLICT, "Shop name already exists");
+        }
+    }
+
+    let logoUrl = shop.logo;
+    let bannerUrl = shop.banner;
+
+    if (files?.logo?.[0]) {
+        const uploadedLogo = await sendToCloudinary(files.logo[0]);
+        if (uploadedLogo?.secure_url) {
+            logoUrl = uploadedLogo.secure_url;
+        }
+    } else if (files?.[0]) {
+        const uploadedLogo = await sendToCloudinary(files[0]);
+        if (uploadedLogo?.secure_url) logoUrl = uploadedLogo.secure_url;
+    }
+
+    if (files?.banner?.[0]) {
+        const uploadedBanner = await sendToCloudinary(files.banner[0]);
+        if (uploadedBanner?.secure_url) {
+            bannerUrl = uploadedBanner.secure_url;
+        }
+    } else if (files?.[1]) {
+        const uploadedBanner = await sendToCloudinary(files[1]);
+        if (uploadedBanner?.secure_url) bannerUrl = uploadedBanner.secure_url;
+    }
+
+    const result = await prisma.shop.update({
+        where: { id },
+        data: {
+            name: body?.name ?? shop.name,
+            description: body?.description ?? shop.description,
+            phone: body?.phone ?? shop.phone,
+            vendorId: body?.vendorId ?? shop.vendorId,
+            address: body?.address ?? shop.address,
+            logo: logoUrl,
+            banner: bannerUrl,
+        },
+    });
+
+    return result;
+};
+
 const softDeleteFromDB = async (id: string) => {
 
     await prisma.shop.findUniqueOrThrow({
@@ -105,6 +162,7 @@ export const ShopServices = {
     insertIntoDB,
     getAllFromDB,
     getSingleFromDB,
+    updateFromDB,
     softDeleteFromDB,
     verifedShop,
     blockedShop
