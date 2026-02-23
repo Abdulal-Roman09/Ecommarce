@@ -1,14 +1,8 @@
 import prisma from "../../../lib/prisma";
-import sendToCloudinary from "../../../lib/sendToCloudinary";
+import { generateSKU } from "../../../lib/sku";
 import { IUploadedFile } from "../../interface/file";
+import sendToCloudinary from "../../../lib/sendToCloudinary";
 import { FromDataProps } from "../../interface/FromDataProps";
-
-const generateSKU = (productName: string, shopId: string): string => {
-    const prefix = productName.toUpperCase().slice(0, 3);
-    const random = Math.random().toString(36).slice(2, 6).toUpperCase();
-    const shopShort = shopId.slice(0, 4);
-    return `${prefix}-${shopShort}-${random}`;
-};
 
 const insertIntoDB = async (payload: FromDataProps) => {
     const file = payload.file as IUploadedFile | undefined;
@@ -67,6 +61,9 @@ const insertIntoDB = async (payload: FromDataProps) => {
 
 const getAllFromDB = async () => {
     return await prisma.product.findMany({
+        where: {
+            isDelete: false
+        },
         include: {
             inventory: true
         }
@@ -75,33 +72,48 @@ const getAllFromDB = async () => {
 
 const deleteFromDB = async (id: string) => {
     const productData = await prisma.product.findUniqueOrThrow({
-        where: { id },
+        where: {
+            id,
+            isDelete: false
+        },
         include: {
             inventory: true
         }
     })
-    console.log(productData)
 
-const result = await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
 
-    if (productData.inventory) {
-        await tx.inventory.delete({
-            where: {
-                id: productData.inventory.id
-            }
+        if (productData.inventory) {
+            await tx.inventory.delete({
+                where: {
+                    id: productData.inventory.id
+                }
+            })
+        }
+
+        const deleteProductData = await tx.product.delete({
+            where: { id }
         })
-    }
 
-    const deleteProductData = await tx.product.delete({
-        where: { id }
+        return deleteProductData
     })
+}
 
-    return deleteProductData
-})
+const softDeleteFromDB = async (id: string) => {
+
+    const result = await prisma.product.update({
+        where: { id },
+        data: {
+            isDelete: true
+        }
+    })
+    return result
+
 }
 
 export const ProductServices = {
     insertIntoDB,
     getAllFromDB,
-    deleteFromDB
+    deleteFromDB,
+    softDeleteFromDB
 };

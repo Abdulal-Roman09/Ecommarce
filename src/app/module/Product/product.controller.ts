@@ -39,8 +39,21 @@ const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const softDeleteFromDB = catchAsync(async (req: Request, res: Response) => {
+    const {id}=req.params
+    const result = await ProductServices.softDeleteFromDB(id as string);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Product deleted successfully.",
+        data: result,
+    });
+});
+
 export const ProductController = {
     insertIntoDB,
     getAllFromDB,
-    deleteFromDB
+    deleteFromDB,
+    softDeleteFromDB
 };

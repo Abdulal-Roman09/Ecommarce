@@ -32,4 +32,9 @@ router.delete(
     ProductController.deleteFromDB
 )
 
+router.delete(
+    "soft-delete/:id",
+    ProductController.softDeleteFromDB
+)
+
 export const ProductRouters = router
