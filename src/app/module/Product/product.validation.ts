@@ -7,8 +7,17 @@ export const createProduct = z.object({
         description: z.string().optional(),
         basePrice: z.number({ message: "Base price must be a positive number" }).positive(),
         image: z.string().optional(),
-        categoryId: z.string({ message: "Category ID is required" })
+        categoryId: z.string({ message: "Category ID is required" }),
+        shopId: z.string({ message: "shopId ID is required" })
     })
+    ,
+    initialStock: z.preprocess((val) => {
+        if (typeof val === 'string') {
+            const n = Number(val);
+            return isNaN(n) ? val : n;
+        }
+        return val;
+    }, z.number().int().nonnegative().optional())
 });
 
 export const updateProduct = z.object({
@@ -19,6 +28,7 @@ export const updateProduct = z.object({
         basePrice: z.number().positive().optional(),
         image: z.string().url().optional(),
         categoryId: z.string().uuid().optional(),
+        shopId: z.string().optional()
     }),
 });
 

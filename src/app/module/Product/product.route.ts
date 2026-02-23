@@ -1,6 +1,6 @@
+import auth from '../../middleware/auth'
 import { UserRole } from '@prisma/client'
 import { fileUploader } from '../../../lib/multer'
-import auth from '../../middleware/auth'
 import { ProductController } from "./product.controller"
 import { ProductValidationSchema } from './product.validation'
 import express, { NextFunction, Request, Response } from 'express'
@@ -12,9 +12,24 @@ router.post(
     fileUploader.upload.single('file'),
     auth(UserRole.VENDOR),
     (req: Request, res: Response, next: NextFunction) => {
-        req.body = ProductValidationSchema.createProduct.parse(JSON.parse(req.body.data))
+        const parsed = JSON.parse(req.body.data);
+        const merged = {
+            ...parsed,
+            initialStock: req.body.initialStock ?? parsed.initialStock,
+        };
+        req.body = ProductValidationSchema.createProduct.parse(merged)
         return ProductController.insertIntoDB(req, res, next)
     }
+)
+
+router.get(
+    "/",
+    ProductController.getAllFromDB
+)
+
+router.delete(
+    "/:id",
+    ProductController.deleteFromDB
 )
 
 export const ProductRouters = router

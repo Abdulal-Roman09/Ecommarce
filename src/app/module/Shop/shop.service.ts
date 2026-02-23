@@ -8,7 +8,6 @@ import { FromDataProps } from "../../interface/FromDataProps";
 const insertIntoDB = async (payload: FromDataProps) => {
     const files = payload?.files as IUploadedFile[];
     const body = payload?.body;
-    console.log("data:", body)
 
     let logoUrl = "";
     let bannerUrl = "";

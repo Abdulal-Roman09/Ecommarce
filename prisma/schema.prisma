@@ -102,6 +102,7 @@ model Product {
   description String?
   basePrice   Float
   image       String?
+  isDelete    Boolean @default(false)
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
@@ -115,6 +116,7 @@ model Product {
   inventory         Inventory?
   orderItems        OrderItem[]
 
+  @@unique([name, brand, shopId])
   @@map("products")
 }
 
@@ -157,8 +159,8 @@ model Inventory {
   id  String @id @default(uuid())
   sku String @unique
 
-  productId String?  @unique
-  product   Product? @relation(fields: [productId], references: [id])
+  productId String  @unique
+  product   Product @relation(fields: [productId], references: [id])
 
   quantity  Int
   createdAt DateTime  @default(now())

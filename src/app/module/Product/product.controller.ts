@@ -16,6 +16,31 @@ const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
+    const result = await ProductServices.getAllFromDB();
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Product fetched successfully.",
+        data: result,
+    });
+});
+
+const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
+    const {id}=req.params
+    const result = await ProductServices.deleteFromDB(id as string);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Product deleted successfully.",
+        data: result,
+    });
+});
+
 export const ProductController = {
-    insertIntoDB
+    insertIntoDB,
+    getAllFromDB,
+    deleteFromDB
 };
