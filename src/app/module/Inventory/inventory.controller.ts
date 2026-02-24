@@ -32,7 +32,20 @@ const removeQuantity = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
+
+    const result = await InventoryServices.getAllFromDB();
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Inventory patch successfully.",
+        data: result
+    });
+});
+
 export const InventoryController = {
     addQuantity,
-    removeQuantity
+    removeQuantity,
+    getAllFromDB
 };

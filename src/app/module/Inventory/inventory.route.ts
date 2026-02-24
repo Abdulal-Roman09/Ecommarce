@@ -13,4 +13,9 @@ router.post(
     InventoryController.removeQuantity
 )
 
+router.get(
+    "/",
+    InventoryController.getAllFromDB
+)
+
 export const InventoryRouters = router

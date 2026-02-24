@@ -15,6 +15,7 @@ const addQuantity = async (id: string, addQty: number) => {
             quantity: { increment: addQty }
         },
     });
+
     const result = await prisma.inventory.findUnique({
         where: { id },
         include: {
@@ -50,7 +51,26 @@ const removeQuantity = async (id: string, removeQty: number) => {
 
 };
 
+const getAllFromDB = async () => {
+
+    const result = await prisma.inventory.findMany({
+        include: {
+            product: {
+                include: {
+                    shop: {
+                        include: {
+                            vendor: true
+                        }
+                    }
+                }
+            }
+        }
+    })
+    return result
+}
+
 export const InventoryServices = {
     addQuantity,
-    removeQuantity
+    removeQuantity,
+    getAllFromDB
 };
