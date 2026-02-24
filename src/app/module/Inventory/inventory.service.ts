@@ -27,7 +27,6 @@ const addQuantity = async (id: string, addQty: number) => {
 
 };
 
-
 const removeQuantity = async (id: string, removeQty: number) => {
 
     if (removeQty <= 0) {
