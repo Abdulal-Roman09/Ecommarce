@@ -1,22 +1,38 @@
 import httpStatus from "http-status";
 import { Request, Response } from "express";
 import catchAsync from "../../../utils/catchAsync";
-import { InventorServices } from "./inventory.service";
 import sendResponse from "../../../utils/sendResponse";
-import { FromDataProps } from "../../interface/FromDataProps";
+import { InventoryServices } from "./inventory.service";
 
-const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
-    const result = await InventorServices.insertIntoDB(req as FromDataProps);
+const addQuantity = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { quantity } = req.body as { quantity: number };
+
+    const result = await InventoryServices.addQuantity(id as string, quantity);
 
     sendResponse(res, {
-        statusCode: httpStatus.CREATED,
+        statusCode: httpStatus.OK,
         success: true,
-        message: "Inventor created successfully.",
-        data: result,
+        message: "Inventory quantity updated successfully.",
+        data: result
     });
 });
 
+const removeQuantity = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { quantity } = req.body as { quantity: number };
 
-export const InventorController = {
-    insertIntoDB
+    const result = await InventoryServices.removeQuantity(id as string, quantity);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Inventory quantity updated successfully.",
+        data: result
+    });
+});
+
+export const InventoryController = {
+    addQuantity,
+    removeQuantity
 };

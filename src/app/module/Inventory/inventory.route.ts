@@ -1,12 +1,16 @@
 import express from "express"
-import { InventorController } from "./inventory.controller"
+import { InventoryController } from "./inventory.controller"
 
 const router = express.Router()
 
-
 router.post(
-    "/create-inventor",
-    InventorController.insertIntoDB
+    "/add-quantity/:id",
+    InventoryController.addQuantity
 )
 
-export const InventorRouters = router
+router.post(
+    "/remove-quantity/:id",
+    InventoryController.removeQuantity
+)
+
+export const InventoryRouters = router

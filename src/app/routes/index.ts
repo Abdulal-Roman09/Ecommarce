@@ -5,6 +5,7 @@ import { CategoryRouters } from '../module/Category/category.routes'
 import { ProductRouters } from '../module/Product/product.route'
 import { VendorRoutes } from '../module/vendor/vendor.routes'
 import { ShopRouters } from '../module/Shop/shop.route'
+import { InventoryRouters } from '../module/Inventory/inventory.route'
 
 
 const router = exprsss.Router()
@@ -33,6 +34,10 @@ const moduleRoutes = [
     {
         path: '/shop',
         route: ShopRouters
+    },
+    {
+        path: '/inventory',
+        route:InventoryRouters
     },
 ]
 
