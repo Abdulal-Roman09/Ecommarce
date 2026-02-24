@@ -12,6 +12,12 @@ router.post(
     WishlistController.insertIntoDB
 );
 
+router.post(
+    "/remove-wishlist/:id",
+    auth(UserRole.CUSTOMER, UserRole.ADMIN),
+    WishlistController.deleteFromDB
+);
+
 router.get(
     "/",
     auth(UserRole.CUSTOMER),

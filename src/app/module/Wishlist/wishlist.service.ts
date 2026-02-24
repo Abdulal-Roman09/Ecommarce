@@ -51,6 +51,22 @@ const insertIntoDB = async (productId: string, accessToken: string) => {
     return result;
 };
 
+const deleteFromDB = async (id: string) => {
+
+    const result = await prisma.wishlist.deleteMany({
+        where: { id }
+    });
+
+    if (result.count === 0) {
+        throw new AppError(
+            httpStatus.NOT_FOUND,
+            "Wishlist item not found"
+        );
+    }
+
+    return result;
+};
+
 const getAllFromDB = async () => {
     const result = await prisma.wishlist.findMany({
         include: {
@@ -63,5 +79,6 @@ const getAllFromDB = async () => {
 
 export const WishlistServices = {
     insertIntoDB,
-    getAllFromDB
+    getAllFromDB,
+    deleteFromDB
 };
