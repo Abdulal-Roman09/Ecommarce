@@ -17,9 +17,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  admin    Admin?
-  vendor   Vendor?
-  customer Customer?
+  admin         Admin?
+  vendor        Vendor?
+  customer      Customer?
+  notifications Notification[]
 
   @@map("users")
 }
@@ -80,6 +81,8 @@ model Customer {
   orders    Order[]
   payments  Payment[]
   wishlists Wishlist[]
+  reviews   Review[]
+  addresses Address[]
 
   @@map("customers")
 }
@@ -117,6 +120,8 @@ model Product {
   inventory         Inventory?
   orderItems        OrderItem[]
   wishlists         Wishlist[]
+  flashSales        FlashSale[]
+  reviews           Review[]
 
   @@unique([name, brand, shopId])
   @@map("products")
@@ -237,8 +242,9 @@ model Order {
   orderItems OrderItem[]
   payment    Payment?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  shipment  Shipment?
 
   @@map("orders")
 }
@@ -262,6 +268,26 @@ model OrderItem {
   @@map("order_items")
 }
 
+model ReturnRequest {
+  id String @id @default(uuid())
+
+  orderId String
+  order   Order @relation(fields: [orderId], references: [id])
+
+  reason  String
+  status  ReturnStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ReturnStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REFUNDED
+}
+
 model Wishlist {
   id String @id @default(uuid())
 
@@ -276,6 +302,85 @@ model Wishlist {
 
   @@unique([customerId, productId])
   @@map("wishlists")
+}
+
+model FlashSale {
+  id String @id @default(uuid())
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  discountPercentage Float
+  startTime          DateTime
+  endTime            DateTime
+
+  isActive Boolean @default(true)
+}
+
+model Review {
+  id String @id @default(uuid())
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  rating  Int
+  comment String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([customerId, productId])
+  @@map("reviews")
+}
+
+model Shipment {
+  id String @id @default(uuid())
+
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  trackingNumber String?
+  carrier        String?
+  shippedAt      DateTime?
+  deliveredAt    DateTime?
+
+  status ShipmentStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Address {
+  id String @id @default(uuid())
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  division   String
+  district   String
+  area       String
+  postalCode String
+
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  title   String
+  message String
+  isRead  Boolean @default(false)
+
+  createdAt DateTime @default(now())
 }
 
 enum UserRole {
@@ -314,4 +419,11 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+}
+
+enum ShipmentStatus {
+  PENDING
+  SHIPPED
+  IN_TRANSIT
+  DELIVERED
 }

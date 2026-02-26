@@ -11,7 +11,6 @@ import emailSender from "../../../lib/emailSender";
 import { IAuthLogin, IAuthUser } from "../../interface/auth";
 import { IChangePassword, ILoginResponse } from "./auth.interfact";
 import { generateToken, verifyToken } from "../../../lib/jwtTokenGenerate&Verify";
-import { tuple } from 'zod';
 
 const login = async (payload: IAuthLogin): Promise<ILoginResponse> => {
 
@@ -62,7 +61,7 @@ const refreshToken = async (token: string): Promise<Partial<ILoginResponse>> => 
     } catch (err) {
         throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!");
     }
-    const userData = await prisma.user.findUniqueOrThrow({
+    const userData = await prisma.user.findFirstOrThrow({
         where: {
             email: decodedData?.email,
             status: UserStatus.ACTIVE
@@ -87,7 +86,7 @@ const refreshToken = async (token: string): Promise<Partial<ILoginResponse>> => 
 const changePassword = async (user: IAuthUser, payload: IChangePassword) => {
     const { newPassword, oldPassword } = payload
 
-    const userData = await prisma.user.findUnique({
+    const userData = await prisma.user.findFirst({
         where: {
             email: user?.email,
             status: UserStatus.ACTIVE
@@ -150,7 +149,7 @@ const forgetPassword = async (payload: { email: string }) => {
 
 const resetPassword = async (token: string, payload: any) => {
 
-    const userData = await prisma.user.findUniqueOrThrow({
+    const userData = await prisma.user.findFirstOrThrow({
         where: {
             id: payload.id,
             status: UserStatus.ACTIVE
@@ -175,9 +174,8 @@ const resetPassword = async (token: string, payload: any) => {
     }
 }
 
-const getMe = async (user: any) => {
-    const accessToken = user.accessToken;
-    const decodedData = verifyToken(accessToken, config.access_token.secret)
+const getMe = async (token: string) => {
+    const decodedData = verifyToken(token, config.access_token.secret) as JwtPayload
 
     const userData = await prisma.user.findFirstOrThrow({
         where: {
@@ -197,12 +195,9 @@ const getMe = async (user: any) => {
                     id: true,
                     name: true,
                     email: true,
-                    role: true,
                     profilePhoto: true,
-                    address: true,
-                    isDelete: true,
                     contactNumber: true,
-                    status: true,
+                    isDelete: true,
                     createdAt: true,
                     updatedAt: true,
                 },
@@ -213,12 +208,13 @@ const getMe = async (user: any) => {
                     id: true,
                     name: true,
                     email: true,
-                    role: true,
                     profilePhoto: true,
-                    address: true,
-                    isDelete: true,
                     contactNumber: true,
-                    status: true,
+                    gender: true,
+                    address: true,
+                    rating: true,
+                    isVerified: true,
+                    isDelete: true,
                     createdAt: true,
                     updatedAt: true,
                     categories: true,
@@ -232,7 +228,8 @@ const getMe = async (user: any) => {
                     email: true,
                     profilePhoto: true,
                     contactNumber: true,
-                    address: true,
+                    presentAddress: true,
+                    isDelete: true,
                     createdAt: true,
                     updatedAt: true,
                 },
