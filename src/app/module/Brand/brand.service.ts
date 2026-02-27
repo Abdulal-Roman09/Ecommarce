@@ -14,10 +14,10 @@ const insertIntoDB = async (payload: FromDataProps) => {
         }
     }
 
-    const result = await prisma..create({
+    const result = await prisma.brand.create({
         data: {
-            title: body.title,
-            icons: fileUrl,
+            name: body.name,
+            logo: fileUrl,
         },
     });
 
@@ -25,11 +25,11 @@ const insertIntoDB = async (payload: FromDataProps) => {
 };
 
 const getAllFromDB = async () => {
-    return prisma.Brand.findMany();
+    return prisma.brand.findMany();
 };
 
 const deleteFromDB = async (id: string) => {
-    return prisma.Brand.delete({
+    return prisma.brand.delete({
         where: { id }
     });
 };

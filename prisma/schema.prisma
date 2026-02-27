@@ -14,6 +14,9 @@ model User {
   role     UserRole   @default(CUSTOMER)
   status   UserStatus @default(ACTIVE)
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -26,16 +29,17 @@ model User {
 }
 
 model Admin {
-  id String @id @default(uuid())
-
-  email String @unique
-  user  User   @relation(fields: [email], references: [email])
+  id     String @id @default(uuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
 
   name          String
   profilePhoto  String?
   contactNumber String
 
-  isDelete  Boolean  @default(false)
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -43,41 +47,47 @@ model Admin {
 }
 
 model Vendor {
-  id String @id @default(uuid())
-
-  email String @unique
-  user  User   @relation(fields: [email], references: [email])
+  id     String @id @default(uuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
 
   name          String
   profilePhoto  String?
   contactNumber String
   gender        Gender
   address       String
-  rating        Float      @default(0)
-  isVerified    Boolean    @default(false)
-  isDelete      Boolean    @default(false)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  shops         Shop[]
-  categories    Category[]
+  rating        Float   @default(0)
+  isVerified    Boolean @default(false)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shops      Shop[]
+  categories Category[]
+  brands     Brand[]
 
   @@map("vendors")
 }
 
 model Customer {
-  id String @id @default(uuid())
-
-  email String @unique
-  user  User   @relation(fields: [email], references: [email])
+  id     String @id @default(uuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
 
   name           String
   contactNumber  String
   profilePhoto   String?
-  presentAddress String
+  presentAddress String?
 
-  isDelete  Boolean    @default(false)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   orders    Order[]
   payments  Payment[]
   wishlists Wishlist[]
@@ -88,59 +98,49 @@ model Customer {
 }
 
 model Category {
-  id    String @id @default(uuid())
+  id    String  @id @default(uuid())
   title String
-  icons String
+  icon  String?
 
   products          Product[]
   productCategories ProductCategory[]
   vendors           Vendor[]
 
-  @@map("categorys")
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("categories")
 }
 
-model Product {
+model Brand {
   id          String  @id @default(uuid())
-  name        String
-  brand       String
+  name        String  @unique
+  slug        String? @unique
+  logo        String?
   description String?
-  basePrice   Float
-  image       String?
-  isDelete    Boolean @default(false)
+  isActive    Boolean @default(true)
 
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
+  vendorId String?
+  vendor   Vendor? @relation(fields: [vendorId], references: [id])
 
-  shopId String
-  shop   Shop   @relation(fields: [shopId], references: [id])
+  products Product[]
 
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  productCategories ProductCategory[]
-  inventory         Inventory?
-  orderItems        OrderItem[]
-  wishlists         Wishlist[]
-  flashSales        FlashSale[]
-  reviews           Review[]
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
-  @@unique([name, brand, shopId])
-  @@map("products")
-}
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-model ProductCategory {
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
-
-  procductId String
-  product    Product @relation(fields: [procductId], references: [id])
-
-  @@id([procductId, categoryId])
-  @@map("produc_categorys")
+  @@map("brands")
 }
 
 model Shop {
   id          String  @id @default(uuid())
-  name        String  @unique
+  name        String
+  slug        String? @unique
   description String? @db.Text
   logo        String?
   banner      String?
@@ -153,13 +153,61 @@ model Shop {
   vendorId String?
   vendor   Vendor? @relation(fields: [vendorId], references: [id])
 
-  products  Product[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  payments  Payment[]
-  orders    Order[]
+  products Product[]
+  orders   Order[]
+  payments Payment[]
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("shops")
+}
+
+model Product {
+  id          String  @id @default(uuid())
+  name        String
+  slug        String?
+  description String? @db.Text
+  basePrice   Float
+  image       String?
+
+  brandId String
+  brand   Brand  @relation(fields: [brandId], references: [id])
+
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id])
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  productCategories ProductCategory[]
+  inventory         Inventory?
+  orderItems        OrderItem[]
+  wishlists         Wishlist[]
+  flashSales        FlashSale[]
+  reviews           Review[]
+  category          Category?         @relation(fields: [categoryId], references: [id])
+  categoryId        String?
+
+  @@unique([slug, shopId])
+  @@unique([name, brandId, shopId])
+  @@map("products")
+}
+
+model ProductCategory {
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([productId, categoryId])
+  @@map("product_categories")
 }
 
 model Inventory {
@@ -169,9 +217,12 @@ model Inventory {
   productId String  @unique
   product   Product @relation(fields: [productId], references: [id])
 
-  quantity  Int
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  quantity          Int @default(0)
+  lowStockThreshold Int @default(10)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   histories History[]
 
   @@map("inventories")
@@ -191,6 +242,60 @@ model History {
   updatedAt DateTime @updatedAt
 
   @@map("histories")
+}
+
+model Order {
+  id String @id @default(uuid())
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id])
+
+  totalAmount Float
+  discount    Float @default(0)
+  shippingFee Float @default(0)
+  grandTotal  Float
+
+  status        OrderStatus   @default(PENDING)
+  paymentStatus PaymentStatus @default(PENDING)
+
+  shippingAddress Json
+  billingAddress  Json?
+
+  orderItems OrderItem[]
+  payment    Payment?
+
+  shipment       Shipment?
+  returnRequests ReturnRequest[]
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id String @id @default(uuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity Int
+  price    Float
+  total    Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("order_items")
 }
 
 model Payment {
@@ -219,73 +324,39 @@ model Payment {
   @@map("payments")
 }
 
-model Order {
+model Shipment {
   id String @id @default(uuid())
 
-  customerId String
-  customer   Customer @relation(fields: [customerId], references: [id])
-
-  shopId String
-  shop   Shop   @relation(fields: [shopId], references: [id])
-
-  totalAmount Float
-  discount    Float @default(0)
-  shippingFee Float @default(0)
-  grandTotal  Float
-
-  status        OrderStatus   @default(PENDING)
-  paymentStatus PaymentStatus @default(PENDING)
-
-  shippingAddress Json
-  billingAddress  Json?
-
-  orderItems OrderItem[]
-  payment    Payment?
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  shipment  Shipment?
-
-  @@map("orders")
-}
-
-model OrderItem {
-  id String @id @default(uuid())
-
-  orderId String
+  orderId String @unique
   order   Order  @relation(fields: [orderId], references: [id])
 
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
+  trackingNumber    String?
+  carrier           String?
+  shippedAt         DateTime?
+  deliveredAt       DateTime?
+  estimatedDelivery DateTime?
 
-  quantity Int
-  price    Float
-  total    Float
+  status ShipmentStatus @default(PENDING)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("order_items")
+  @@map("shipments")
 }
 
 model ReturnRequest {
   id String @id @default(uuid())
 
   orderId String
-  order   Order @relation(fields: [orderId], references: [id])
+  order   Order  @relation(fields: [orderId], references: [id])
 
-  reason  String
-  status  ReturnStatus @default(PENDING)
+  reason String
+  status ReturnStatus @default(PENDING)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
 
-enum ReturnStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  REFUNDED
+  @@map("return_requests")
 }
 
 model Wishlist {
@@ -304,19 +375,6 @@ model Wishlist {
   @@map("wishlists")
 }
 
-model FlashSale {
-  id String @id @default(uuid())
-
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-
-  discountPercentage Float
-  startTime          DateTime
-  endTime            DateTime
-
-  isActive Boolean @default(true)
-}
-
 model Review {
   id String @id @default(uuid())
 
@@ -329,6 +387,8 @@ model Review {
   rating  Int
   comment String?
 
+  isVerified Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -336,21 +396,23 @@ model Review {
   @@map("reviews")
 }
 
-model Shipment {
+model FlashSale {
   id String @id @default(uuid())
 
-  orderId String @unique
-  order   Order  @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
 
-  trackingNumber String?
-  carrier        String?
-  shippedAt      DateTime?
-  deliveredAt    DateTime?
+  discountPercentage Float
+  startTime          DateTime
+  endTime            DateTime
 
-  status ShipmentStatus @default(PENDING)
+  isActive Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([productId])
+  @@map("flash_sales")
 }
 
 model Address {
@@ -363,11 +425,14 @@ model Address {
   district   String
   area       String
   postalCode String
-
-  isDefault Boolean @default(false)
+  houseNo    String?
+  roadNo     String?
+  isDefault  Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("addresses")
 }
 
 model Notification {
@@ -381,6 +446,9 @@ model Notification {
   isRead  Boolean @default(false)
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("notifications")
 }
 
 enum UserRole {
@@ -398,6 +466,7 @@ enum UserStatus {
 enum Gender {
   MALE
   FEMALE
+  OTHER
 }
 
 enum ActionType {
@@ -419,6 +488,7 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+  RETURNED
 }
 
 enum ShipmentStatus {
@@ -426,4 +496,12 @@ enum ShipmentStatus {
   SHIPPED
   IN_TRANSIT
   DELIVERED
+  FAILED
+}
+
+enum ReturnStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REFUNDED
 }
