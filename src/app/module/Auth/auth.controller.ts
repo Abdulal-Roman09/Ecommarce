@@ -97,7 +97,6 @@ const getMe = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-
 export const AuthController = {
     login,
     refreshToken,

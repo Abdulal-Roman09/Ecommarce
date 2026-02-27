@@ -6,7 +6,8 @@ import { IUploadedFile } from "../../interface/file"
 import { userSearchableFields } from "./user.constance"
 import sendToCloudinary from "../../../lib/sendToCloudinary"
 import { calculatePagination } from "../../../lib/paginationHealper"
-import { Admin, Customer, Prisma, UserRole, Vendor } from "@prisma/client"
+import { Admin, Customer, Prisma, UserRole, UserStatus, Vendor } from "@prisma/client"
+import { IAuthUser } from "../../interface/auth"
 
 const createAdmin = async (req: Request): Promise<Admin> => {
 
@@ -199,8 +200,77 @@ const getAllFromDB = async (params: any, options: any) => {
     }
 }
 
-const deleteFromDB = async (id: string) => {
+const changeProfileStatus = async (id: string, payload: { status: UserStatus }) => {
 
+
+    await prisma.user.findUniqueOrThrow({
+        where: {
+            id
+        }
+    })
+
+    const updateUserstatus = await prisma.user.update({
+        where: {
+            id
+        },
+        data: {
+            status: payload.status
+        }
+    })
+    return updateUserstatus
+}
+
+const updateMyProfile = async (user: IAuthUser, req: Request & { file: IUploadedFile }) => {
+
+    const userData = await prisma.user.findUniqueOrThrow({
+        where: { email: user?.email }
+    });
+
+    const file = req.file as IUploadedFile;
+    if (file) {
+        const upload = await sendToCloudinary(file);
+        req.body.profilePhoto = upload?.secure_url;
+    }
+
+    let profileInfo;
+
+    if (userData.role === UserRole.SUPER_ADMIN) {
+        profileInfo = await prisma.admin.update({
+            where: {
+                email: userData.email
+            },
+            data: req.body
+        });
+    }
+
+    else if (userData.role === UserRole.ADMIN) {
+        profileInfo = await prisma.admin.update({
+            where: {
+                email: userData.email
+            },
+            data: req.body
+        });
+    }
+
+    else if (userData.role === UserRole.VENDOR) {
+        profileInfo = await prisma.vendor.update({
+            where: {
+                email: userData.email
+            },
+            data: req.body
+        });
+    }
+
+    else if (userData.role === UserRole.CUSTOMER) {
+        profileInfo = await prisma.customer.update({
+            where: {
+                email: userData.email
+            },
+            data: req.body
+        });
+    }
+    
+    return { ...profileInfo }
 }
 
 export const UserService = {
@@ -208,5 +278,6 @@ export const UserService = {
     createVendor,
     createCustomer,
     getAllFromDB,
-    deleteFromDB
+    changeProfileStatus,
+    updateMyProfile
 }

@@ -13,7 +13,6 @@ model User {
   password String
   role     UserRole   @default(CUSTOMER)
   status   UserStatus @default(ACTIVE)
-
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
 
@@ -29,9 +28,10 @@ model User {
 }
 
 model Admin {
-  id     String @id @default(uuid())
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique
+  id String @id @default(uuid())
+
+  email String @unique
+  user  User   @relation(fields: [email], references: [email])
 
   name          String
   profilePhoto  String?
@@ -47,9 +47,10 @@ model Admin {
 }
 
 model Vendor {
-  id     String @id @default(uuid())
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique
+  id String @id @default(uuid())
+
+  email String @unique
+  user  User   @relation(fields: [email], references: [email])
 
   name          String
   profilePhoto  String?
@@ -73,9 +74,10 @@ model Vendor {
 }
 
 model Customer {
-  id     String @id @default(uuid())
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique
+  id String @id @default(uuid())
+
+  email String @unique
+  user  User   @relation(fields: [email], references: [email])
 
   name           String
   contactNumber  String
@@ -100,7 +102,7 @@ model Customer {
 model Category {
   id    String  @id @default(uuid())
   title String
-  icon  String?
+  icons  String?
 
   products          Product[]
   productCategories ProductCategory[]

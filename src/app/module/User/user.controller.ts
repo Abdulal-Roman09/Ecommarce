@@ -6,6 +6,8 @@ import catchAsync from "../../../utils/catchAsync";
 import sendResponse from "../../../utils/sendResponse";
 import { userFilterableFields } from "./user.constance";
 import { paginationHealperOptions } from "../../../lib/paginationHealper";
+import { boolean } from "zod";
+import { IAuthUser } from "../../interface/auth";
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
 
@@ -55,23 +57,35 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
+const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params
-    const result = await UserService.deleteFromDB(id as string)
+    const result = await UserService.changeProfileStatus(id as string, req.body)
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Users delete successfully",
+        message: "Profile status changed successfully",
         data: result
     });
 });
 
+const updateMyprofile = catchAsync(async (req: Request , res: Response) => {
+    const user = req.user
+    const result = await UserService.updateMyProfile(user as IAuthUser, req);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Profile status changed successfully",
+        data: result
+    });
+});
 
 export const UserController = {
     createAdmin,
     createVendor,
     createCustomer,
     getAllFromDB,
-    deleteFromDB
+    changeProfileStatus,
+    updateMyprofile
 }

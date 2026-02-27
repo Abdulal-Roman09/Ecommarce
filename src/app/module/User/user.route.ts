@@ -9,6 +9,7 @@ const router = express.Router()
 
 router.get(
     "/",
+    auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
     UserController.getAllFromDB
 )
 
@@ -42,9 +43,20 @@ router.post(
     }
 )
 
-router.delete(
+router.patch(
+    "/status/:id",
+    auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+    UserController.changeProfileStatus
+)
+
+router.patch(
     "/:id",
-    UserController.deleteFromDB
+    auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+    fileUploader.upload.single('file'),
+    (req: Request, res: Response, next: NextFunction) => {
+        req.body =JSON.parse(req.body.data)
+        return UserController.updateMyprofile(req, res, next)
+    }
 )
 
 export const UserRoutes = router

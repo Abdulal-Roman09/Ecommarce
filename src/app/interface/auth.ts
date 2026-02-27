@@ -1,7 +1,7 @@
 export type IAuthUser = {
     email: string;
-    role: string
-} | null
+    role: string;
+};
 
 export type IAuthLogin = {
     email: string;
