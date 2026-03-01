@@ -6,7 +6,7 @@ import { FromDataProps } from "../../interface/FromDataProps";
 
 const insertIntoDB = async (payload: FromDataProps) => {
     const file = payload.file as IUploadedFile | undefined;
-    console.log("data:", payload.body)
+
     let imageUrl = "";
 
     if (file) {
@@ -26,10 +26,10 @@ const insertIntoDB = async (payload: FromDataProps) => {
         vendorId: string
 
     };
-    console.log(productData)
+
 
     const initialStock = Number(payload.body.initialStock ?? 0);
-    console.log(initialStock)
+
 
     const result = await prisma.$transaction(async (tx) => {
 
@@ -39,7 +39,7 @@ const insertIntoDB = async (payload: FromDataProps) => {
                 image: imageUrl || null,
             },
         });
-        console.log(createdProduct)
+
 
         if (initialStock > 0) {
             await tx.inventory.create({
@@ -50,11 +50,10 @@ const insertIntoDB = async (payload: FromDataProps) => {
                 },
             });
         }
-        console.log(createdProduct)
+
         return createdProduct;
     });
 
-    console.log("Product & Inventory created:", result);
     return result;
 
 };

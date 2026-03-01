@@ -29,6 +29,7 @@ route.post(
 
 route.post(
     "/reset-password",
+    auth(UserRole.ADMIN, UserRole.CUSTOMER, UserRole.SUPER_ADMIN, UserRole.VENDOR),
     AuthController.resetPassword
 )
 

@@ -13,6 +13,11 @@ router.get(
     UserController.getAllFromDB
 )
 
+router.get(
+    "/:id",
+    auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.CUSTOMER, UserRole.VENDOR),
+    UserController.getSingleFromDB
+)
 
 router.post(
     "/create-admin",
@@ -50,11 +55,11 @@ router.patch(
 )
 
 router.patch(
-    "/:id",
-    auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+    "/update-my-profile",
+    auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.VENDOR, UserRole.CUSTOMER),
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
-        req.body =JSON.parse(req.body.data)
+        req.body = JSON.parse(req.body.data)
         return UserController.updateMyprofile(req, res, next)
     }
 )

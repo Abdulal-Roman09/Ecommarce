@@ -57,6 +57,20 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getSingleFromDB = catchAsync(async (req: Request, res: Response) => {
+
+    const { id } = req.params
+
+    const result = await UserService.getSingleFromDB(id as string)
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Users fetched successfully",
+        data: result
+    });
+});
+
 const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params
     const result = await UserService.changeProfileStatus(id as string, req.body)
@@ -69,7 +83,7 @@ const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-const updateMyprofile = catchAsync(async (req: Request , res: Response) => {
+const updateMyprofile = catchAsync(async (req: Request & { user?: IAuthUser }, res: Response) => {
     const user = req.user
     const result = await UserService.updateMyProfile(user as IAuthUser, req);
 
@@ -86,6 +100,7 @@ export const UserController = {
     createVendor,
     createCustomer,
     getAllFromDB,
+    getSingleFromDB,
     changeProfileStatus,
     updateMyprofile
 }

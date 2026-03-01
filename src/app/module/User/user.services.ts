@@ -200,6 +200,27 @@ const getAllFromDB = async (params: any, options: any) => {
     }
 }
 
+const getSingleFromDB = async (id: string) => {
+    const result = await prisma.user.findUniqueOrThrow({
+        where: { id },
+        select: {
+            id: true,
+            email: true,
+            role: true,
+            status: true,
+            isDeleted: true,
+            deletedAt: true,
+            createdAt: true,
+            updatedAt: true,
+            vendor: true,
+            customer: true,
+            admin: true,
+        },
+    });
+
+    return result;
+};
+
 const changeProfileStatus = async (id: string, payload: { status: UserStatus }) => {
 
 
@@ -223,7 +244,7 @@ const changeProfileStatus = async (id: string, payload: { status: UserStatus }) 
 const updateMyProfile = async (user: IAuthUser, req: Request & { file: IUploadedFile }) => {
 
     const userData = await prisma.user.findUniqueOrThrow({
-        where: { email: user?.email }
+        where: { email: user?.email, status: UserStatus.ACTIVE }
     });
 
     const file = req.file as IUploadedFile;
@@ -269,7 +290,7 @@ const updateMyProfile = async (user: IAuthUser, req: Request & { file: IUploaded
             data: req.body
         });
     }
-    
+
     return { ...profileInfo }
 }
 
@@ -278,6 +299,7 @@ export const UserService = {
     createVendor,
     createCustomer,
     getAllFromDB,
+    getSingleFromDB,
     changeProfileStatus,
     updateMyProfile
 }

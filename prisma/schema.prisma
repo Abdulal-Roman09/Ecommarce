@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  id       String     @id @default(uuid())
-  email    String     @unique
-  password String
-  role     UserRole   @default(CUSTOMER)
-  status   UserStatus @default(ACTIVE)
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
+  id                 String     @id @default(uuid())
+  email              String     @unique
+  password           String
+  role               UserRole   @default(CUSTOMER)
+  status             UserStatus @default(ACTIVE)
+  isDeleted          Boolean    @default(false)
+  deletedAt          DateTime?
+  needPasswordChange Boolean    @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -102,7 +103,7 @@ model Customer {
 model Category {
   id    String  @id @default(uuid())
   title String
-  icons  String?
+  icons String?
 
   products          Product[]
   productCategories ProductCategory[]

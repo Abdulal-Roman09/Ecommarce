@@ -50,7 +50,7 @@ const login = async (payload: IAuthLogin): Promise<ILoginResponse> => {
     return {
         accessToken,
         refreshToken,
-        needPasswordChange: true
+        needPasswordChange: userData.needPasswordChange
     };
 };
 
@@ -147,7 +147,7 @@ const forgetPassword = async (payload: { email: string }) => {
     await emailSender(userData.email, html, "🌿 EcoMart");
 }
 
-const resetPassword = async (token: string, payload: any) => {
+const resetPassword = async (token: string, payload: { id: string, password: string }) => {
 
     const userData = await prisma.user.findFirstOrThrow({
         where: {
@@ -155,7 +155,8 @@ const resetPassword = async (token: string, payload: any) => {
             status: UserStatus.ACTIVE
         }
     })
-    const isValidToken = verifyToken(token, config.reset_token.secret)
+
+    const isValidToken = verifyToken(token, config.access_token.secret)
 
     if (!isValidToken) {
         throw new AppError(httpStatus.FORBIDDEN, "firbidden")
@@ -166,7 +167,9 @@ const resetPassword = async (token: string, payload: any) => {
             id: userData.id
         },
         data: {
-            password: hasedNewPassword
+            password: hasedNewPassword,
+            needPasswordChange: false
+
         }
     })
     return {
@@ -197,7 +200,7 @@ const getMe = async (token: string) => {
                     email: true,
                     profilePhoto: true,
                     contactNumber: true,
-                    isDelete: true,
+                    isDeleted: true,
                     createdAt: true,
                     updatedAt: true,
                 },
@@ -214,7 +217,7 @@ const getMe = async (token: string) => {
                     address: true,
                     rating: true,
                     isVerified: true,
-                    isDelete: true,
+                    isDeleted: true,
                     createdAt: true,
                     updatedAt: true,
                     categories: true,
@@ -229,7 +232,7 @@ const getMe = async (token: string) => {
                     profilePhoto: true,
                     contactNumber: true,
                     presentAddress: true,
-                    isDelete: true,
+                    isDeleted: true,
                     createdAt: true,
                     updatedAt: true,
                 },
