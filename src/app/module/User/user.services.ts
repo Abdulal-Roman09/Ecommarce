@@ -37,6 +37,7 @@ const createAdmin = async (req: Request): Promise<Admin> => {
                 user: true,
             }
         })
+        
         const { password, ...userWithoutPassword } = adminData.user;
 
         return {
