@@ -37,6 +37,7 @@ model Admin {
   name          String
   profilePhoto  String?
   contactNumber String
+  gender        Gender  @default(MALE)
 
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
@@ -84,9 +85,9 @@ model Customer {
   contactNumber  String
   profilePhoto   String?
   presentAddress String?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
+  gender         Gender    @default(MALE)
+  isDeleted      Boolean   @default(false)
+  deletedAt      DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
